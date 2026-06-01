@@ -271,93 +271,6 @@ html,body{height:100%;background:var(--cream);color:var(--ink);font-family:'Crim
 <!-- ══════════════════════════════════════════ -->
 <!--  SETUP SCREEN (shown if no Supabase config) -->
 <!-- ══════════════════════════════════════════ -->
-<div id="setup-screen" class="setup-wrap" style="display:none">
-  <div class="setup-card">
-    <div style="font-size:36px;margin-bottom:12px">📚</div>
-    <div class="setup-title">Book Club Setup</div>
-    <div class="setup-sub">Connect Supabase to get started — free & takes ~5 minutes</div>
-    <ol class="steps-list">
-      <li>Go to <a href="https://supabase.com" target="_blank" style="color:var(--amber)">supabase.com</a> → sign up free</li>
-      <li>Click <strong>New project</strong> — name it "bookclub"</li>
-      <li>Go to <strong>Authentication → Providers</strong> → ensure <strong>Email</strong> is enabled</li>
-      <li>Go to <strong>Authentication → Email Templates</strong> → disable <strong>"Confirm email"</strong> so accounts work instantly</li>
-      <li>Go to <strong>SQL Editor</strong> and run the SQL below</li>
-      <li>Go to <strong>Project Settings → API</strong>, copy your Project URL and anon key</li>
-    </ol>
-    <div class="code-block">-- Run this in Supabase SQL Editor
-
-create table if not exists club_settings (
-  key text primary key,
-  value text
-);
-
-create table if not exists members (
-  id uuid primary key,
-  email text unique not null,
-  name text not null,
-  role text default 'user',
-  avatar_color text default '#c47c2b',
-  created_at timestamptz default now()
-);
-
-create table if not exists proposed_books (
-  id text primary key,
-  title text not null,
-  author text not null,
-  pages integer,
-  status text default 'pending',
-  suggested_by uuid references members(id),
-  created_at timestamptz default now()
-);
-
-create table if not exists votes (
-  id text primary key,
-  book_id text references proposed_books(id) on delete cascade,
-  member_id uuid references members(id),
-  created_at timestamptz default now(),
-  unique(book_id, member_id)
-);
-
-create table if not exists history (
-  id text primary key,
-  title text not null,
-  author text not null,
-  pages integer,
-  read_date text,
-  meetup_date text,
-  created_at timestamptz default now()
-);
-
--- Row level security (open for anon key)
-alter table club_settings enable row level security;
-alter table members enable row level security;
-alter table proposed_books enable row level security;
-alter table votes enable row level security;
-alter table history enable row level security;
-
-create policy "all_club_settings" on club_settings for all using (true) with check (true);
-create policy "all_members" on members for all using (true) with check (true);
-create policy "all_proposed_books" on proposed_books for all using (true) with check (true);
-create policy "all_votes" on votes for all using (true) with check (true);
-create policy "all_history" on history for all using (true) with check (true);
-
--- Enable realtime
-alter publication supabase_realtime add table club_settings;
-alter publication supabase_realtime add table proposed_books;
-alter publication supabase_realtime add table votes;
-alter publication supabase_realtime add table history;</div>
-    <div class="field">
-      <label class="label">Supabase Project URL</label>
-      <input class="input" id="setup-url" type="url" placeholder="https://xxxxxxxxxxxx.supabase.co">
-    </div>
-    <div class="field">
-      <label class="label">Supabase Anon Key</label>
-      <input class="input" id="setup-key" type="password" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
-    </div>
-    <div id="setup-error" class="alert alert-error" style="display:none"></div>
-    <button class="btn btn-amber" style="width:100%;padding:12px" onclick="saveSetup()">Connect & Continue →</button>
-  </div>
-</div>
 
 <!-- ══════════════════════════════════════════ -->
 <!--  LOGIN SCREEN -->
@@ -686,11 +599,6 @@ alter publication supabase_realtime add table history;</div>
                 <input class="input" id="setting-club-name" type="text" placeholder="The Book Club" style="flex:1">
                 <button class="btn btn-outline btn-sm" onclick="saveSetting('club_name', document.getElementById('setting-club-name').value)">Save</button>
               </div>
-            </div>
-            <div class="divider" style="margin:14px 0"></div>
-            <div class="flex-row">
-              <span style="font-size:14px;color:var(--ink2)">Disconnect Supabase</span>
-              <button class="btn btn-danger btn-sm ml-auto" onclick="disconnectSupabase()">Disconnect</button>
             </div>
           </div>
         </div>
@@ -1129,64 +1037,47 @@ function showAlert(id, msg, type='error'){
 }
 function hideAlert(id){ document.getElementById(id).style.display='none' }
 
-// ── SUPABASE INIT ──
-async function loadSupabase(){
-  const cfg = getConfig();
-  if(!cfg) return null;
-  return window.createSupabaseClient(cfg.url, cfg.key);
-}
-function getConfig(){
-  try{ return JSON.parse(localStorage.getItem('bookclub_sb_config')) }
-  catch{ return null }
-}
-function saveConfig(url, key){ localStorage.setItem('bookclub_sb_config', JSON.stringify({url,key})) }
-function clearConfig(){ localStorage.removeItem('bookclub_sb_config') }
+// ── SUPABASE CONFIG (hardcoded) ──
+const SB_URL = 'https://znbdizavmzglvwbqqzya.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuYmRpemF2bXpnbHZ3YnFxenlhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyODgxODUsImV4cCI6MjA5NTg2NDE4NX0.ZUa6gjYWQPqKaF6vWZVbTwLt7sPxepzWgpEj9aZJKOM';
 
 async function initApp(){
-  // Load Supabase JS
   await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js');
-  
-  const cfg = getConfig();
-  if(!cfg){
-    document.getElementById('loading-overlay').style.display='none';
-    document.getElementById('setup-screen').style.display='flex';
-    return;
-  }
-  
+
   try{
-    SB = window.supabase.createClient(cfg.url, cfg.key);
-    
-    // Check for magic link hash
+    SB = window.supabase.createClient(SB_URL, SB_KEY);
+
+    // Handle password recovery redirect
+    const hash = window.location.hash;
+    if(hash && hash.includes('type=recovery')){
+      // Let onAuthStateChange handle it
+    }
+
     const { data: { session } } = await SB.auth.getSession();
-    
+
     if(!session){
       document.getElementById('loading-overlay').style.display='none';
       document.getElementById('login-screen').style.display='flex';
-      return;
+    } else {
+      currentUser = session.user;
+      await loadMemberProfile();
+      if(currentMember){
+        await bootApp();
+      } else {
+        document.getElementById('loading-overlay').style.display='none';
+        document.getElementById('login-screen').style.display='flex';
+      }
     }
-    
-    currentUser = session.user;
-    await loadMemberProfile();
-    
-    if(!currentMember){
-      // User authenticated but no member record — might be first admin
-      document.getElementById('loading-overlay').style.display='none';
-      document.getElementById('login-screen').style.display='flex';
-      return;
-    }
-    
-    await bootApp();
-    
+
   } catch(e){
     console.error(e);
     document.getElementById('loading-overlay').style.display='none';
-    document.getElementById('setup-screen').style.display='flex';
+    document.getElementById('login-screen').style.display='flex';
   }
-  
-  // Listen for auth changes
-  if(SB) SB.auth.onAuthStateChange(async (event, session) => {
+
+  // Auth state listener
+  SB.auth.onAuthStateChange(async (event, session) => {
     if(event === 'PASSWORD_RECOVERY'){
-      // User clicked reset link — show set password screen
       currentUser = session.user;
       document.getElementById('login-screen').style.display='none';
       document.getElementById('loading-overlay').style.display='none';
@@ -1795,8 +1686,7 @@ async function sendInvite(){
   // Create Supabase auth user with password
   // We use signUp — this creates the auth user
   // We need to use a secondary client so we don't log out the current admin
-  const cfg = getConfig();
-  const tempClient = window.supabase.createClient(cfg.url, cfg.key);
+  const tempClient = window.supabase.createClient(SB_URL, SB_KEY);
   const { data: signUpData, error: signUpErr } = await tempClient.auth.signUp({ email, password });
 
   if(signUpErr){ showAlert('invite-error','Could not create account: '+signUpErr.message); return; }
@@ -1938,56 +1828,6 @@ function openModal(id){ document.getElementById(id).classList.remove('hidden') }
 function closeModal(id){ document.getElementById(id).classList.add('hidden') }
 
 // ── SETUP / LOGIN ──
-async function saveSetup(){
-  const url = document.getElementById('setup-url').value.trim();
-  const key = document.getElementById('setup-key').value.trim();
-  const err = document.getElementById('setup-error');
-  err.style.display='none';
-  
-  if(!url || !key){ err.textContent='Please fill in both fields.'; err.style.display='block'; return; }
-  
-  try{
-    const client = window.supabase.createClient(url, key);
-    const { error } = await client.from('club_settings').select('key').limit(1);
-    if(error) throw error;
-    saveConfig(url, key);
-    SB = client;
-    document.getElementById('setup-screen').style.display='none';
-    document.getElementById('loading-overlay').style.display='flex';
-    
-    const { data: { session } } = await SB.auth.getSession();
-    if(session){
-      currentUser = session.user;
-      await loadMemberProfile();
-      if(currentMember) await bootApp();
-      else { document.getElementById('loading-overlay').style.display='none'; document.getElementById('login-screen').style.display='flex'; }
-    } else {
-      document.getElementById('loading-overlay').style.display='none';
-      document.getElementById('login-screen').style.display='flex';
-    }
-    
-    SB.auth.onAuthStateChange(async (event, session) => {
-      if(event==='PASSWORD_RECOVERY'){
-        currentUser = session.user;
-        document.getElementById('login-screen').style.display='none';
-        document.getElementById('loading-overlay').style.display='none';
-        document.getElementById('set-password-screen').style.display='flex';
-      } else if(event==='SIGNED_IN' && session && !currentUser){
-        currentUser = session.user;
-        document.getElementById('login-screen').style.display='none';
-        document.getElementById('loading-overlay').style.display='flex';
-        await loadMemberProfile();
-        if(currentMember) await bootApp();
-        else { document.getElementById('loading-overlay').style.display='none'; showNoMemberMessage(); }
-      }
-    });
-    
-  } catch(e){
-    err.textContent = 'Could not connect: '+e.message+'. Check your URL and key.';
-    err.style.display='block';
-  }
-}
-
 // ── LOGIN PANEL SWITCHING ──
 function showLoginPanel(){
   document.getElementById('login-panel').style.display='block';
@@ -2035,9 +1875,8 @@ async function doForgotPassword(){
   btn.innerHTML = '<span class="spinner"></span> Sending…';
   btn.disabled = true;
 
-  const redirectUrl = window.location.href.split('?')[0].split('#')[0];
   const { error } = await SB.auth.resetPasswordForEmail(email, {
-    redirectTo: redirectUrl
+    redirectTo: 'https://andrewsalo75-maker.github.io/book-club'
   });
 
   btn.innerHTML = 'Send reset link →';
@@ -2074,12 +1913,6 @@ async function doSetPassword(){
   else { document.getElementById('loading-overlay').style.display='none'; showNoMemberMessage(); }
 }
 
-
-function disconnectSupabase(){
-  if(!confirm('Disconnect Supabase? You will need to set it up again.')) return;
-  clearConfig();
-  location.reload();
-}
 
 // ── FIRST-LOGIN MEMBER SYNC ──
 // When a user signs in via magic link, if their auth user ID doesn't match 
