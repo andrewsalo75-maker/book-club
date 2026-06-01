@@ -231,6 +231,25 @@ html,body{height:100%;background:var(--cream);color:var(--ink);font-family:'Crim
 .loading-card .load-icon{font-size:32px;margin-bottom:10px;display:block}
 .loading-card .load-text{font-size:15px;color:var(--ink2);font-style:italic}
 
+/* ── FILTER BUTTONS ── */
+.filter-btn{border:1px solid var(--border);background:var(--surface);color:var(--ink3);border-radius:20px;padding:4px 12px;font-family:'Crimson Pro',serif;font-size:12px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.filter-btn:hover{border-color:var(--amber);color:var(--amber)}
+.filter-btn.active{background:var(--amber);border-color:var(--amber);color:#fff}
+
+/* ── LIBRARY BOOK ROW ── */
+.lib-row{display:flex;align-items:center;gap:12px;padding:9px 4px;border-bottom:1px solid var(--border2);transition:background .1s}
+.lib-row:last-child{border-bottom:none}
+.lib-row:hover{background:var(--warm);margin:0 -4px;padding:9px 8px;border-radius:var(--radius-sm)}
+.lib-row-info{flex:1;min-width:0}
+.lib-row-title{font-size:14px;color:var(--ink);line-height:1.3}
+.lib-row-author{font-size:12px;color:var(--ink3);font-style:italic}
+.lib-row-pages{font-size:11px;color:var(--ink4);margin-top:1px}
+.lib-vote-btn{border:1.5px solid var(--amber);background:none;color:var(--amber);border-radius:var(--radius-sm);padding:5px 12px;font-family:'Crimson Pro',serif;font-size:12px;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.lib-vote-btn:hover{background:var(--amber);color:#fff}
+.lib-vote-btn.voted{background:var(--amber);color:#fff}
+.lib-vote-btn:disabled{opacity:.35;cursor:not-allowed;border-color:var(--border)}
+.lib-vote-count{font-size:11px;color:var(--ink4);text-align:center;margin-top:2px}
+
 .flex-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .ml-auto{margin-left:auto}
 .mt-0{margin-top:0}
@@ -389,6 +408,9 @@ alter publication supabase_realtime add table history;</div>
       <a class="nav-item active" onclick="showTab('meetup')" data-tab="meetup">
         <span class="nav-icon">📅</span> Next Meetup
       </a>
+      <a class="nav-item" onclick="showTab('nextbook')" data-tab="nextbook">
+        <span class="nav-icon">🔖</span> Next Chosen
+      </a>
       <a class="nav-item" onclick="showTab('vote')" data-tab="vote">
         <span class="nav-icon">🗳️</span> Vote for Next
         <span class="nav-badge" id="vote-badge" style="display:none">0</span>
@@ -487,6 +509,47 @@ alter publication supabase_realtime add table history;</div>
           </div>
           <div class="card-body">
             <div id="meetup-location-display" style="font-size:15px;color:var(--ink2);font-style:italic">Not specified</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ── NEXT CHOSEN BOOK TAB ── -->
+    <div class="page" id="tab-nextbook">
+      <div class="page-header">
+        <div class="page-title">Next Chosen Book</div>
+        <div class="page-sub">Our selected book for the upcoming meetup</div>
+      </div>
+      <div class="page-body">
+        <div id="nextbook-display">
+          <div class="empty-state"><div class="empty-icon">🔖</div><div class="empty-text">No book chosen yet — vote to help decide!</div></div>
+        </div>
+        <div class="card" id="nextbook-edit-card" style="display:none">
+          <div class="card-head">
+            <span class="card-icon">✏️</span>
+            <span class="card-title">Set Next Chosen Book</span>
+            <span class="card-badge">Admin</span>
+          </div>
+          <div class="card-body">
+            <div class="alert alert-info" style="margin-bottom:14px">Setting a book here announces it to all members as the next chosen read.</div>
+            <div class="field">
+              <label class="label">Book Title</label>
+              <input class="input" id="nextbook-title" type="text" placeholder="Title">
+            </div>
+            <div class="field">
+              <label class="label">Author</label>
+              <input class="input" id="nextbook-author" type="text" placeholder="Author name">
+            </div>
+            <div class="field">
+              <label class="label">Pages (optional)</label>
+              <input class="input" id="nextbook-pages" type="number" placeholder="e.g. 340">
+            </div>
+            <div id="save-nextbook-alert" class="alert" style="display:none"></div>
+            <div class="flex-row">
+              <button class="btn btn-amber" onclick="saveNextBook()">Save</button>
+              <button class="btn btn-outline ml-auto" onclick="clearNextBook()">Clear</button>
+            </div>
           </div>
         </div>
       </div>
@@ -596,6 +659,9 @@ alter publication supabase_realtime add table history;</div>
   <div class="mobile-nav-inner">
     <button class="mob-nav-btn active" onclick="showTab('meetup')" data-tab="meetup">
       <span class="mob-icon">📅</span> Meetup
+    </button>
+    <button class="mob-nav-btn" onclick="showTab('nextbook')" data-tab="nextbook">
+      <span class="mob-icon">🔖</span> Next
     </button>
     <button class="mob-nav-btn" onclick="showTab('vote')" data-tab="vote">
       <span class="mob-icon">🗳️</span> Vote
@@ -1113,6 +1179,7 @@ async function bootApp(){
     document.getElementById('admin-nav-item').style.display='flex';
     document.getElementById('admin-mob-item').style.display='flex';
     document.getElementById('meetup-edit-card').style.display='block';
+    document.getElementById('nextbook-edit-card').style.display='block';
   }
   
   // Set sidebar user info
@@ -1126,7 +1193,9 @@ async function bootApp(){
   await Promise.all([loadSettings(), loadProposedBooks(), loadMyVotes(), loadHistory(), loadMembers()]);
   
   renderMeetup();
+  renderNextBook();
   renderVoteTab();
+  renderLibrary();
   renderHistory();
   renderAdmin();
   
@@ -1160,13 +1229,13 @@ async function loadMembers(){
 function setupRealtime(){
   const ch = SB.channel('bookclub-changes')
     .on('postgres_changes', {event:'*', schema:'public', table:'club_settings'}, async () => {
-      await loadSettings(); renderMeetup();
+      await loadSettings(); renderMeetup(); renderNextBook();
     })
     .on('postgres_changes', {event:'*', schema:'public', table:'proposed_books'}, async () => {
       await loadProposedBooks(); await loadMyVotes(); renderVoteTab(); renderAdmin();
     })
     .on('postgres_changes', {event:'*', schema:'public', table:'votes'}, async () => {
-      await loadProposedBooks(); await loadMyVotes(); renderVoteTab();
+      await loadProposedBooks(); await loadMyVotes(); renderVoteTab(); renderLibrary();
     })
     .on('postgres_changes', {event:'*', schema:'public', table:'history'}, async () => {
       await loadHistory(); renderHistory();
@@ -1296,6 +1365,9 @@ async function archiveCurrentBook(){
   // Remove all votes
   await SB.from('votes').delete().neq('id', 'NEVER');
   
+  // Remove library-status proposed books (keep pending/approved for next round)
+  await SB.from('proposed_books').delete().eq('status', 'library');
+  
   // Clear current book from settings
   for(const key of ['current_book_title','current_book_author','current_book_pages']){
     await SB.from('club_settings').upsert({key, value:''});
@@ -1313,7 +1385,162 @@ async function archiveCurrentBook(){
   setTimeout(()=>hideAlert('save-meetup-alert'), 4000);
 }
 
-// ── VOTE TAB RENDER ──
+// ── GENRE CATEGORIES (index ranges in BOOK_LIBRARY) ──
+// We'll tag books by genre based on their position in the extracted list
+const GENRE_MAP = {
+  new: [0,11],        // New titles
+  aus: [12,56],       // Australian fiction
+  classics: [57,87],  // Classics
+  contemporary: [88,168], // Contemporary
+  historical: [169,230],  // Historical
+  mystery: [231,296], // Mystery & Crime
+  nonfiction: [297,999] // Non-Fiction
+};
+let currentGenreFilter = 'all';
+
+// ── NEXT CHOSEN BOOK ──
+function renderNextBook(){
+  const title = settings['next_book_title'];
+  const author = settings['next_book_author'];
+  const pages = settings['next_book_pages'];
+  const wrap = document.getElementById('nextbook-display');
+
+  if(title){
+    wrap.innerHTML = `
+      <div class="meetup-hero" style="background:linear-gradient(135deg,#3a2a5a 0%,#1d1535 100%);margin-bottom:16px">
+        <div class="meetup-label">Next Chosen Read</div>
+        <div class="meetup-date" style="font-size:26px">${esc(title)}</div>
+        <div class="meetup-date-sub">${esc(author||'')}</div>
+        ${pages ? `<div class="meetup-countdown">📄 ${pages} pages</div>` : ''}
+      </div>
+      <div class="card">
+        <div class="card-body" style="font-size:14px;color:var(--ink3);font-style:italic;text-align:center;padding:14px">
+          📖 This is our next book — start requesting it from your library!
+        </div>
+      </div>`;
+  } else {
+    wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">🔖</div><div class="empty-text">No book chosen yet — vote to help decide!</div></div>`;
+  }
+
+  // Populate admin edit fields
+  if(currentMember && currentMember.role === 'admin'){
+    document.getElementById('nextbook-title').value = title || '';
+    document.getElementById('nextbook-author').value = author || '';
+    document.getElementById('nextbook-pages').value = pages || '';
+  }
+}
+
+async function saveNextBook(){
+  const title = document.getElementById('nextbook-title').value.trim();
+  const author = document.getElementById('nextbook-author').value.trim();
+  const pages = document.getElementById('nextbook-pages').value;
+  if(!title){ showAlert('save-nextbook-alert','Please enter a title'); return; }
+  await SB.from('club_settings').upsert({key:'next_book_title', value:title});
+  await SB.from('club_settings').upsert({key:'next_book_author', value:author});
+  await SB.from('club_settings').upsert({key:'next_book_pages', value:pages});
+  await loadSettings(); renderNextBook();
+  showAlert('save-nextbook-alert','✓ Next book saved!','success');
+  setTimeout(()=>hideAlert('save-nextbook-alert'),3000);
+}
+
+async function clearNextBook(){
+  if(!confirm('Clear the next chosen book?')) return;
+  for(const key of ['next_book_title','next_book_author','next_book_pages']){
+    await SB.from('club_settings').upsert({key, value:''});
+  }
+  await loadSettings(); renderNextBook();
+}
+
+// ── LIBRARY VOTING ──
+// library votes are stored in proposed_books with status='library'
+// book_id = 'lib_' + index in BOOK_LIBRARY
+
+function setGenreFilter(genre, btn){
+  currentGenreFilter = genre;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  filterLibrary();
+}
+
+function filterLibrary(){
+  const q = (document.getElementById('library-search')||{value:''}).value.toLowerCase().trim();
+  renderLibrary(q);
+}
+
+function renderLibrary(q=''){
+  const el = document.getElementById('library-list');
+  if(!el) return;
+
+  let books = BOOK_LIBRARY.map((b,i)=>({...b, idx:i}));
+
+  // Genre filter
+  if(currentGenreFilter !== 'all'){
+    const range = GENRE_MAP[currentGenreFilter];
+    if(range) books = books.filter(b => b.idx >= range[0] && b.idx <= range[1]);
+  }
+
+  // Text filter
+  if(q.length >= 2){
+    books = books.filter(b => b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q));
+  }
+
+  if(books.length === 0){
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--ink3);font-style:italic;font-size:14px">No books match your search</div>';
+    return;
+  }
+
+  // Build vote lookup: lib votes stored in proposedBooks with id = 'lib_N'
+  const libVoteMap = {}; // id -> count
+  const myLibVotes = new Set();
+  proposedBooks.filter(b=>b.id.startsWith('lib_')).forEach(b=>{
+    libVoteMap[b.id] = (b.votes && b.votes[0]) ? b.votes[0].count : 0;
+    if(myVotes.includes(b.id)) myLibVotes.add(b.id);
+  });
+
+  const remaining = MAX_VOTES - myVotes.length;
+
+  el.innerHTML = books.map(b => {
+    const libId = 'lib_' + b.idx;
+    const vCount = libVoteMap[libId] || 0;
+    const iVoted = myLibVotes.has(libId);
+    const canVote = !iVoted && remaining > 0;
+    return `<div class="lib-row">
+      <div class="lib-row-info">
+        <div class="lib-row-title">${esc(b.title)}</div>
+        <div class="lib-row-author">${esc(b.author)}</div>
+        ${b.pages ? `<div class="lib-row-pages">📄 ${b.pages}p</div>` : ''}
+      </div>
+      <div style="text-align:center;flex-shrink:0">
+        <button class="lib-vote-btn ${iVoted?'voted':''}" onclick="castLibVote('${libId}','${esc(b.title).replace(/'/g,"\\'")}','${esc(b.author).replace(/'/g,"\\'")}',${b.pages||0})" ${(!canVote && !iVoted)?'disabled':''}>${iVoted?'✓ Voted':'Vote'}</button>
+        ${vCount > 0 ? `<div class="lib-vote-count">${vCount} vote${vCount===1?'':'s'}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function castLibVote(libId, title, author, pages){
+  // If already voted, remove vote
+  if(myVotes.includes(libId)){
+    await SB.from('votes').delete().eq('book_id', libId).eq('member_id', currentMember.id);
+    await loadMyVotes(); await loadProposedBooks(); renderVoteTab(); renderLibrary();
+    return;
+  }
+  if(myVotes.length >= MAX_VOTES) return;
+
+  // Ensure the book exists in proposed_books
+  const existing = proposedBooks.find(b => b.id === libId);
+  if(!existing){
+    await SB.from('proposed_books').upsert({
+      id: libId, title, author, pages: pages||null,
+      status: 'library', suggested_by: currentMember.id
+    });
+  }
+
+  await SB.from('votes').insert({id:uid(), book_id:libId, member_id:currentMember.id});
+  await loadMyVotes(); await loadProposedBooks(); renderVoteTab(); renderLibrary();
+}
+
+
 function renderVoteTab(){
   // Votes remaining
   const used = myVotes.length;
@@ -1324,18 +1551,18 @@ function renderVoteTab(){
   document.getElementById('vote-dots').innerHTML = dotsHtml;
   document.getElementById('votes-left-text').textContent = `${remaining} of ${MAX_VOTES} votes remaining`;
   
-  // Badge
-  const approved = proposedBooks.filter(b => b.status === 'approved');
+  // Badge — total votes cast across everything
+  const totalVoted = myVotes.length;
   const badge = document.getElementById('vote-badge');
   const mobBadge = document.getElementById('mob-vote-badge');
-  if(approved.length > 0){
-    badge.textContent = approved.length; badge.style.display='inline-block';
-    mobBadge.textContent = approved.length; mobBadge.style.display='block';
+  if(totalVoted > 0){
+    badge.textContent = totalVoted; badge.style.display='inline-block';
+    mobBadge.textContent = totalVoted; mobBadge.style.display='block';
   } else {
     badge.style.display='none'; mobBadge.style.display='none';
   }
   
-  // Pending (only show to the person who suggested, or admins)
+  // Pending (only show to the person who suggested)
   const pending = proposedBooks.filter(b => b.status === 'pending');
   const myPending = pending.filter(b => b.suggested_by === currentMember.id);
   const pendSection = document.getElementById('pending-review-section');
@@ -1352,46 +1579,45 @@ function renderVoteTab(){
       </div>`).join('');
   } else { pendSection.style.display='none' }
   
-  // Approved books
+  // Member-suggested books (approved, non-library)
+  const approved = proposedBooks.filter(b => b.status === 'approved');
   const list = document.getElementById('vote-books-list');
+  
   if(approved.length === 0){
-    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📚</div><div class="empty-text">No books to vote on yet — suggest one!</div></div>';
-    return;
-  }
-  
-  // Sort by vote count desc
-  const sorted = [...approved].sort((a,b) => {
-    const av = (a.votes && a.votes[0]) ? a.votes[0].count : 0;
-    const bv = (b.votes && b.votes[0]) ? b.votes[0].count : 0;
-    return bv - av;
-  });
-  const maxVotes = sorted[0] ? ((sorted[0].votes && sorted[0].votes[0]) ? sorted[0].votes[0].count : 0) : 1;
-  
-  list.innerHTML = sorted.map(book => {
-    const voteCount = (book.votes && book.votes[0]) ? book.votes[0].count : 0;
-    const iVoted = myVotes.includes(book.id);
-    const canVote = !iVoted && remaining > 0;
-    const barW = maxVotes > 0 ? Math.round((voteCount / maxVotes) * 100) : 0;
+    list.innerHTML = '<div style="font-size:13px;color:var(--ink3);font-style:italic;padding:4px 0">No member suggestions approved yet.</div>';
+  } else {
+    const sorted = [...approved].sort((a,b) => {
+      const av = (a.votes && a.votes[0]) ? a.votes[0].count : 0;
+      const bv = (b.votes && b.votes[0]) ? b.votes[0].count : 0;
+      return bv - av;
+    });
+    const maxVotes = sorted[0] ? ((sorted[0].votes && sorted[0].votes[0]) ? sorted[0].votes[0].count : 0) : 1;
     
-    return `<div class="vote-book ${iVoted ? 'voted-this' : ''}">
-      <div class="vote-book-info">
-        <div class="vote-book-title">${esc(book.title)}</div>
-        <div class="vote-book-author">${esc(book.author)}</div>
-        ${book.pages ? `<div class="vote-book-status">📄 ${book.pages} pages</div>` : ''}
-        <div class="vote-bar-wrap"><div class="vote-bar" style="width:${barW}%"></div></div>
-      </div>
-      <div class="vote-actions">
-        <div>
-          <div class="vote-count">${voteCount}</div>
-          <div class="vote-count-label">vote${voteCount===1?'':'s'}</div>
+    list.innerHTML = sorted.map(book => {
+      const voteCount = (book.votes && book.votes[0]) ? book.votes[0].count : 0;
+      const iVoted = myVotes.includes(book.id);
+      const canVote = !iVoted && remaining > 0;
+      const barW = maxVotes > 0 ? Math.round((voteCount / maxVotes) * 100) : 0;
+      return `<div class="vote-book ${iVoted ? 'voted-this' : ''}">
+        <div class="vote-book-info">
+          <div class="vote-book-title">${esc(book.title)}</div>
+          <div class="vote-book-author">${esc(book.author)}</div>
+          ${book.pages ? `<div class="vote-book-status">📄 ${book.pages} pages</div>` : ''}
+          <div class="vote-bar-wrap"><div class="vote-bar" style="width:${barW}%"></div></div>
         </div>
-        ${iVoted 
-          ? `<button class="btn-vote voted" onclick="removeVote('${book.id}')">✓ Voted</button>`
-          : `<button class="btn-vote" onclick="castVote('${book.id}')" ${canVote?'':'disabled'}>${canVote?'Vote':'No votes'}</button>`
-        }
-      </div>
-    </div>`;
-  }).join('');
+        <div class="vote-actions">
+          <div>
+            <div class="vote-count">${voteCount}</div>
+            <div class="vote-count-label">vote${voteCount===1?'':'s'}</div>
+          </div>
+          ${iVoted 
+            ? `<button class="btn-vote voted" onclick="removeVote('${book.id}')">✓ Voted</button>`
+            : `<button class="btn-vote" onclick="castVote('${book.id}')" ${canVote?'':'disabled'}>${canVote?'Vote':'No votes'}</button>`
+          }
+        </div>
+      </div>`;
+    }).join('');
+  }
 }
 
 async function castVote(bookId){
