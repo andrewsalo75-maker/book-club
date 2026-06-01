@@ -520,9 +520,9 @@ html,body{height:100%;background:var(--cream);color:var(--ink);font-family:'Crim
         <div class="flex-row" style="align-items:flex-start;gap:12px">
           <div>
             <div class="page-title">Vote for Next Read</div>
-            <div class="page-sub">Have your say on what we read next</div>
+            <div class="page-sub">Browse the ACT Libraries list or suggest your own</div>
           </div>
-          <button class="btn btn-outline btn-sm ml-auto" style="flex-shrink:0" onclick="openSuggestModal()">+ Suggest a book</button>
+          <button class="btn btn-outline btn-sm ml-auto" style="flex-shrink:0" onclick="openSuggestModal()">+ Suggest unlisted book</button>
         </div>
       </div>
       <div class="page-body">
@@ -531,15 +531,40 @@ html,body{height:100%;background:var(--cream);color:var(--ink);font-family:'Crim
           <div class="vote-dots" id="vote-dots"></div>
           <span id="votes-left-text" style="font-size:13px;color:var(--ink3)"></span>
         </div>
+
+        <!-- ACT Libraries book list -->
+        <div class="card" style="margin-bottom:16px">
+          <div class="card-head">
+            <span class="card-icon">📚</span>
+            <span class="card-title">ACT Libraries Book List</span>
+            <span style="font-size:12px;color:var(--ink3);margin-left:auto;font-style:italic">385 books</span>
+          </div>
+          <div class="card-body" style="padding:14px 16px">
+            <div class="search-wrap" style="margin-bottom:10px">
+              <span class="search-icon">🔍</span>
+              <input class="input" id="library-search" type="text" placeholder="Search by title or author..." oninput="filterLibrary()">
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+              <button class="filter-btn active" onclick="setGenreFilter('all',this)">All</button>
+              <button class="filter-btn" onclick="setGenreFilter('new',this)">New Titles</button>
+              <button class="filter-btn" onclick="setGenreFilter('aus',this)">Australian</button>
+              <button class="filter-btn" onclick="setGenreFilter('classics',this)">Classics</button>
+              <button class="filter-btn" onclick="setGenreFilter('contemporary',this)">Contemporary</button>
+              <button class="filter-btn" onclick="setGenreFilter('historical',this)">Historical</button>
+              <button class="filter-btn" onclick="setGenreFilter('mystery',this)">Mystery</button>
+              <button class="filter-btn" onclick="setGenreFilter('nonfiction',this)">Non-Fiction</button>
+            </div>
+            <div id="library-list" style="max-height:380px;overflow-y:auto"></div>
+          </div>
+        </div>
+
         <div id="pending-review-section" style="display:none">
-          <div class="section-title">⏳ Awaiting Admin Approval</div>
+          <div class="section-title">⏳ Your Pending Suggestions</div>
           <div id="pending-books-list"></div>
           <hr class="divider">
         </div>
-        <div class="section-title" id="approved-section-title">Books to Vote On</div>
-        <div id="vote-books-list">
-          <div class="empty-state"><div class="empty-icon">📚</div><div class="empty-text">No books proposed yet — suggest one!</div></div>
-        </div>
+        <div class="section-title">Member Suggested Books</div>
+        <div id="vote-books-list"></div>
       </div>
     </div>
 
