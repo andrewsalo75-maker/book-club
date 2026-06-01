@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Book Club">
+<meta name="theme-color" content="#1a1009">
+<title>The Book Club</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+a,button,input,select,[onclick]{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+:root{
+  --ink:#1a1009;--ink2:#4a3728;--ink3:#8a6f5a;--ink4:#b89880;
+  --cream:#f5efe6;--warm:#ede4d6;--paper:#faf7f2;
+  --border:#d4c4b0;--border2:#e8ddd0;
+  --forest:#2d4a35;--forest-light:#4a7a57;--forest-pale:#e8f0ea;
+  --amber:#c47c2b;--amber-light:#f5e4c8;--amber-pale:#fdf6eb;
+  --rose:#8b3a4a;--rose-light:#f2dfe3;
+  --surface:#ffffff;
+  --radius:10px;--radius-sm:6px;
+  --shadow:0 2px 8px rgba(26,16,9,.08),0 1px 2px rgba(26,16,9,.04);
+  --shadow-md:0 4px 16px rgba(26,16,9,.12),0 2px 4px rgba(26,16,9,.06);
+}
+html,body{height:100%;background:var(--cream);color:var(--ink);font-family:'Crimson Pro',Georgia,serif;font-size:16px;line-height:1.6}
+
+/* ── SHELL ── */
+.shell{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:220px;flex-shrink:0;background:var(--ink);display:flex;flex-direction:column;border-right:1px solid rgba(255,255,255,.06)}
+.main{flex:1;overflow-y:auto;background:var(--cream)}
+
+/* ── SIDEBAR ── */
+.brand{padding:28px 20px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand-icon{font-size:28px;margin-bottom:8px;display:block}
+.brand-name{font-family:'Playfair Display',Georgia,serif;font-size:20px;font-weight:400;color:#fff;letter-spacing:.2px;line-height:1.2}
+.brand-sub{font-size:12px;color:rgba(255,255,255,.4);margin-top:4px;font-style:italic}
+
+.nav{flex:1;padding:12px 0;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 20px;cursor:pointer;color:rgba(255,255,255,.55);font-size:14px;font-family:'Crimson Pro',serif;font-weight:400;letter-spacing:.1px;transition:all .15s;border-left:2px solid transparent;text-decoration:none;position:relative}
+.nav-item:hover{color:rgba(255,255,255,.85);background:rgba(255,255,255,.04)}
+.nav-item.active{color:#fff;background:rgba(255,255,255,.07);border-left-color:var(--amber)}
+.nav-item .nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+.nav-item .nav-badge{margin-left:auto;background:var(--amber);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;font-family:'Crimson Pro',serif}
+
+.sidebar-bottom{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08)}
+.user-pill{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border-radius:var(--radius-sm);padding:10px 12px;cursor:pointer;transition:background .15s}
+.user-pill:hover{background:rgba(255,255,255,.1)}
+.user-avatar{width:30px;height:30px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;font-weight:600;flex-shrink:0}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:13px;color:rgba(255,255,255,.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-size:11px;color:rgba(255,255,255,.35);font-style:italic}
+
+/* ── MOBILE NAV ── */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--ink);border-top:1px solid rgba(255,255,255,.08);z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+.mobile-nav-inner{display:flex;justify-content:space-around;align-items:center;height:56px}
+.mob-nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 12px;cursor:pointer;color:rgba(255,255,255,.45);font-size:10px;font-family:'Crimson Pro',serif;border:none;background:none;transition:color .15s;position:relative}
+.mob-nav-btn.active{color:var(--amber)}
+.mob-nav-btn .mob-icon{font-size:18px}
+.mob-badge{position:absolute;top:4px;right:8px;background:var(--amber);color:#fff;font-size:9px;padding:1px 4px;border-radius:8px;min-width:14px;text-align:center}
+
+/* ── PAGE STRUCTURE ── */
+.page{display:none;min-height:100%;padding-bottom:20px}
+.page.active{display:block}
+.page-header{padding:28px 32px 20px;border-bottom:1px solid var(--border2);background:var(--paper);position:sticky;top:0;z-index:10}
+.page-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:400;color:var(--ink);line-height:1.2}
+.page-sub{font-size:14px;color:var(--ink3);margin-top:3px;font-style:italic}
+.page-body{padding:24px 32px}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden}
+.card-head{padding:16px 20px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:10px}
+.card-icon{font-size:20px}
+.card-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:400}
+.card-body{padding:20px}
+.card-badge{margin-left:auto;background:var(--amber-light);color:var(--amber);font-size:12px;padding:3px 10px;border-radius:12px;font-weight:500}
+
+/* ── MEETUP DISPLAY ── */
+.meetup-hero{background:linear-gradient(135deg,var(--forest) 0%,#1d3226 100%);border-radius:var(--radius);padding:28px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden}
+.meetup-hero::before{content:'📚';position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:80px;opacity:.1}
+.meetup-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;font-family:'Crimson Pro',serif}
+.meetup-date{font-family:'Playfair Display',serif;font-size:32px;font-weight:400;line-height:1.2;margin-bottom:4px}
+.meetup-date-sub{font-size:14px;color:rgba(255,255,255,.6);font-style:italic}
+.meetup-countdown{font-size:13px;color:rgba(255,255,255,.5);margin-top:10px;display:flex;align-items:center;gap:6px}
+
+.book-hero{background:var(--paper);border:2px solid var(--border2);border-radius:var(--radius);padding:24px;display:flex;gap:20px;align-items:flex-start}
+.book-spine{width:52px;height:72px;border-radius:4px;background:linear-gradient(135deg,var(--amber) 0%,#8b5a1a 100%);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;box-shadow:3px 3px 8px rgba(0,0,0,.2)}
+.book-info{flex:1}
+.book-info-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px}
+.book-info-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--ink);line-height:1.3}
+.book-info-author{font-size:15px;color:var(--ink2);margin-top:3px;font-style:italic}
+.book-info-pages{font-size:13px;color:var(--ink3);margin-top:6px}
+
+/* ── VOTING ── */
+.vote-book{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:16px 18px;display:flex;gap:14px;align-items:flex-start;margin-bottom:10px;transition:border-color .2s,box-shadow .2s;cursor:default}
+.vote-book:hover{border-color:var(--border);box-shadow:var(--shadow)}
+.vote-book.voted-this{border-color:var(--amber);background:var(--amber-pale)}
+.vote-book-info{flex:1;min-width:0}
+.vote-book-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:400;line-height:1.3;color:var(--ink)}
+.vote-book-author{font-size:13px;color:var(--ink3);margin-top:2px;font-style:italic}
+.vote-book-status{font-size:11px;color:var(--ink4);margin-top:4px}
+.vote-bar-wrap{margin-top:8px;background:var(--warm);border-radius:4px;height:6px;overflow:hidden}
+.vote-bar{height:100%;background:var(--amber);border-radius:4px;transition:width .4s ease}
+.vote-actions{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.vote-count{font-family:'Playfair Display',serif;font-size:20px;font-weight:400;color:var(--ink2);text-align:center;min-width:30px}
+.vote-count-label{font-size:10px;color:var(--ink4);text-align:center;margin-top:-4px}
+.btn-vote{border:2px solid var(--amber);background:none;color:var(--amber);border-radius:var(--radius-sm);padding:6px 14px;font-family:'Crimson Pro',serif;font-size:13px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-vote:hover{background:var(--amber);color:#fff}
+.btn-vote.voted{background:var(--amber);color:#fff}
+.btn-vote:disabled{opacity:.4;cursor:not-allowed}
+.vote-chip{display:inline-flex;align-items:center;gap:6px;background:var(--forest-pale);color:var(--forest);font-size:13px;border-radius:20px;padding:6px 14px}
+
+/* ── PENDING BOOKS ── */
+.pending-book{background:var(--surface);border:1px dashed var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;gap:12px;align-items:center;margin-bottom:8px}
+.pending-book .pend-info{flex:1}
+.pending-book .pend-title{font-size:14px;font-weight:500;color:var(--ink)}
+.pending-book .pend-author{font-size:13px;color:var(--ink3);font-style:italic}
+.pending-badge{font-size:11px;background:var(--amber-light);color:var(--amber);padding:2px 8px;border-radius:10px;flex-shrink:0}
+
+/* ── HISTORY ── */
+.hist-item{display:flex;gap:14px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--border2)}
+.hist-item:last-child{border-bottom:none}
+.hist-spine{width:36px;height:50px;border-radius:3px;background:linear-gradient(135deg,var(--ink3) 0%,var(--ink2) 100%);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;opacity:.8}
+.hist-info{flex:1}
+.hist-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--ink)}
+.hist-author{font-size:13px;color:var(--ink3);font-style:italic;margin-top:1px}
+.hist-date{font-size:12px;color:var(--ink4);margin-top:3px}
+
+/* ── ADMIN ── */
+.member-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border2)}
+.member-row:last-child{border-bottom:none}
+.member-avatar-lg{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;flex-shrink:0}
+.member-info{flex:1;min-width:0}
+.member-name{font-size:15px;color:var(--ink);font-weight:500}
+.member-email{font-size:12px;color:var(--ink3)}
+.member-role-badge{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500;flex-shrink:0}
+.role-admin{background:var(--rose-light);color:var(--rose)}
+.role-user{background:var(--forest-pale);color:var(--forest)}
+.member-actions{display:flex;gap:6px;flex-shrink:0}
+
+/* ── BUTTONS ── */
+.btn{border:none;border-radius:var(--radius-sm);padding:9px 18px;font-family:'Crimson Pro',serif;font-size:14px;cursor:pointer;transition:all .15s;font-weight:500}
+.btn-primary{background:var(--ink);color:#fff}
+.btn-primary:hover{background:var(--ink2)}
+.btn-amber{background:var(--amber);color:#fff}
+.btn-amber:hover{background:#a86920}
+.btn-outline{background:none;border:1px solid var(--border);color:var(--ink2)}
+.btn-outline:hover{border-color:var(--ink3);background:var(--warm)}
+.btn-danger{background:var(--rose-light);color:var(--rose);border:none}
+.btn-danger:hover{background:var(--rose);color:#fff}
+.btn-sm{padding:6px 12px;font-size:13px}
+.btn-xs{padding:4px 9px;font-size:12px}
+
+/* ── FORM ELEMENTS ── */
+.field{margin-bottom:14px}
+.label{display:block;font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+.input{width:100%;padding:10px 13px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Crimson Pro',serif;font-size:15px;background:var(--surface);color:var(--ink);outline:none;transition:border-color .15s}
+.input:focus{border-color:var(--amber)}
+.select{width:100%;padding:10px 13px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Crimson Pro',serif;font-size:15px;background:var(--surface);color:var(--ink);outline:none;cursor:pointer}
+.select:focus{border-color:var(--amber)}
+
+/* ── MODALS ── */
+.overlay{position:fixed;inset:0;background:rgba(26,16,9,.6);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
+.overlay.hidden{display:none}
+.modal{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-md);width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+.modal-head{padding:20px 24px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:400}
+.modal-close{background:none;border:none;font-size:20px;color:var(--ink3);cursor:pointer;padding:4px 8px;border-radius:4px;line-height:1}
+.modal-close:hover{background:var(--warm);color:var(--ink)}
+.modal-body{padding:20px 24px}
+.modal-foot{padding:16px 24px;border-top:1px solid var(--border2);display:flex;gap:10px;justify-content:flex-end}
+
+/* ── LOGIN ── */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--ink);padding:20px}
+.login-card{background:var(--paper);border-radius:16px;padding:40px 36px;width:100%;max-width:400px;text-align:center}
+.login-logo{font-size:48px;margin-bottom:16px}
+.login-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:400;color:var(--ink);margin-bottom:6px}
+.login-sub{font-size:15px;color:var(--ink3);font-style:italic;margin-bottom:28px}
+.login-form{text-align:left}
+.login-hint{font-size:13px;color:var(--ink3);text-align:center;margin-top:12px;font-style:italic}
+.login-success{background:var(--forest-pale);border:1px solid var(--forest-light);border-radius:var(--radius-sm);padding:16px;color:var(--forest);font-size:14px;margin-top:16px;text-align:center;display:none}
+
+/* ── SETUP SCREEN ── */
+.setup-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--ink);padding:20px}
+.setup-card{background:var(--paper);border-radius:16px;padding:36px;width:100%;max-width:560px}
+.setup-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:400;margin-bottom:6px}
+.setup-sub{font-size:14px;color:var(--ink3);font-style:italic;margin-bottom:24px}
+.code-block{background:var(--ink);border-radius:var(--radius-sm);padding:16px;font-family:'Courier New',monospace;font-size:11px;color:#74C69D;line-height:1.8;white-space:pre-wrap;word-break:break-all;margin-bottom:16px;overflow-x:auto}
+.steps-list{margin:0 0 20px 20px;font-size:14px;color:var(--ink2);line-height:2}
+.steps-list li{margin-bottom:4px}
+
+/* ── ALERTS ── */
+.alert{padding:12px 16px;border-radius:var(--radius-sm);font-size:14px;margin-bottom:14px}
+.alert-info{background:var(--amber-pale);border:1px solid var(--amber-light);color:var(--ink2)}
+.alert-success{background:var(--forest-pale);border:1px solid var(--forest-light);color:var(--forest)}
+.alert-error{background:var(--rose-light);border:1px solid #e5c8cc;color:var(--rose)}
+
+/* ── VOTES REMAINING ── */
+.votes-remaining{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--amber-pale);border:1px solid var(--amber-light);border-radius:var(--radius-sm);margin-bottom:16px;font-size:14px;color:var(--ink2)}
+.vote-dots{display:flex;gap:5px}
+.vote-dot{width:10px;height:10px;border-radius:50%;background:var(--amber);transition:background .2s}
+.vote-dot.used{background:var(--border)}
+
+/* ── SEARCH BOX ── */
+.search-wrap{position:relative;margin-bottom:16px}
+.search-wrap .input{padding-left:38px}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink4);font-size:16px;pointer-events:none}
+.search-results{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);z-index:100;max-height:250px;overflow-y:auto;display:none}
+.search-results.open{display:block}
+.search-result{padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border2);transition:background .1s}
+.search-result:hover{background:var(--warm)}
+.search-result:last-child{border-bottom:none}
+.search-result-title{font-size:14px;color:var(--ink)}
+.search-result-author{font-size:12px;color:var(--ink3);font-style:italic}
+
+/* ── MISC ── */
+.section-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:400;color:var(--ink);margin-bottom:14px}
+.divider{border:none;border-top:1px solid var(--border2);margin:20px 0}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500}
+.empty-state{text-align:center;padding:40px 20px;color:var(--ink3)}
+.empty-state .empty-icon{font-size:40px;margin-bottom:12px}
+.empty-state .empty-text{font-size:15px;font-style:italic}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-overlay{position:fixed;inset:0;background:rgba(26,16,9,.6);display:flex;align-items:center;justify-content:center;z-index:2000;backdrop-filter:blur(4px)}
+.loading-card{background:var(--surface);border-radius:var(--radius);padding:24px 32px;text-align:center}
+.loading-card .load-icon{font-size:32px;margin-bottom:10px;display:block}
+.loading-card .load-text{font-size:15px;color:var(--ink2);font-style:italic}
+
+.flex-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.ml-auto{margin-left:auto}
+.mt-0{margin-top:0}
+.mb-0{margin-bottom:0}
+
+@media(max-width:680px){
+  .sidebar{display:none}
+  .mobile-nav{display:block}
+  .main{padding-bottom:56px}
+  .page-header{padding:20px 16px 14px;position:relative}
+  .page-body{padding:16px}
+  .meetup-date{font-size:24px}
+  .book-hero{flex-direction:column;gap:12px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════ -->
+<!--  SETUP SCREEN (shown if no Supabase config) -->
+<!-- ══════════════════════════════════════════ -->
+<div id="setup-screen" class="setup-wrap" style="display:none">
+  <div class="setup-card">
+    <div style="font-size:36px;margin-bottom:12px">📚</div>
+    <div class="setup-title">Book Club Setup</div>
+    <div class="setup-sub">Connect Supabase to get started — free & takes ~5 minutes</div>
+    <ol class="steps-list">
+      <li>Go to <a href="https://supabase.com" target="_blank" style="color:var(--amber)">supabase.com</a> → sign up free</li>
+      <li>Click <strong>New project</strong> — name it "bookclub"</li>
+      <li>Go to <strong>Authentication → Providers</strong> and ensure <strong>Email</strong> is enabled</li>
+      <li>Go to <strong>SQL Editor</strong> and run the SQL below</li>
+      <li>Go to <strong>Project Settings → API</strong>, copy your Project URL and anon key</li>
+    </ol>
+    <div class="code-block">-- Run this in Supabase SQL Editor
+
+create table if not exists club_settings (
+  key text primary key,
+  value text
+);
+
+create table if not exists members (
+  id uuid primary key,
+  email text unique not null,
+  name text not null,
+  role text default 'user',
+  avatar_color text default '#c47c2b',
+  created_at timestamptz default now()
+);
+
+create table if not exists proposed_books (
+  id text primary key,
+  title text not null,
+  author text not null,
+  pages integer,
+  status text default 'pending',
+  suggested_by uuid references members(id),
+  created_at timestamptz default now()
+);
+
+create table if not exists votes (
+  id text primary key,
+  book_id text references proposed_books(id) on delete cascade,
+  member_id uuid references members(id),
+  created_at timestamptz default now(),
+  unique(book_id, member_id)
+);
+
+create table if not exists history (
+  id text primary key,
+  title text not null,
+  author text not null,
+  pages integer,
+  read_date text,
+  meetup_date text,
+  created_at timestamptz default now()
+);
+
+-- Row level security (open for anon key)
+alter table club_settings enable row level security;
+alter table members enable row level security;
+alter table proposed_books enable row level security;
+alter table votes enable row level security;
+alter table history enable row level security;
+
+create policy "all_club_settings" on club_settings for all using (true) with check (true);
+create policy "all_members" on members for all using (true) with check (true);
+create policy "all_proposed_books" on proposed_books for all using (true) with check (true);
+create policy "all_votes" on votes for all using (true) with check (true);
+create policy "all_history" on history for all using (true) with check (true);
+
+-- Enable realtime
+alter publication supabase_realtime add table club_settings;
+alter publication supabase_realtime add table proposed_books;
+alter publication supabase_realtime add table votes;
+alter publication supabase_realtime add table history;</div>
+    <div class="field">
+      <label class="label">Supabase Project URL</label>
+      <input class="input" id="setup-url" type="url" placeholder="https://xxxxxxxxxxxx.supabase.co">
+    </div>
+    <div class="field">
+      <label class="label">Supabase Anon Key</label>
+      <input class="input" id="setup-key" type="password" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+    </div>
+    <div id="setup-error" class="alert alert-error" style="display:none"></div>
+    <button class="btn btn-amber" style="width:100%;padding:12px" onclick="saveSetup()">Connect & Continue →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!--  LOGIN SCREEN -->
+<!-- ══════════════════════════════════════════ -->
+<div id="login-screen" class="login-wrap" style="display:none">
+  <div class="login-card">
+    <div class="login-logo">📖</div>
+    <div class="login-title">The Book Club</div>
+    <div class="login-sub">Sign in to join your club</div>
+    <div class="login-form">
+      <div class="field">
+        <label class="label">Email address</label>
+        <input class="input" id="login-email" type="email" placeholder="your@email.com" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div id="login-error" class="alert alert-error" style="display:none"></div>
+      <button class="btn btn-amber" id="login-btn" style="width:100%;padding:12px" onclick="doLogin()">Send magic link →</button>
+      <div class="login-hint">We'll send a sign-in link to your email — no password needed.</div>
+      <div class="login-success" id="login-success">
+        ✉️ Check your email! A sign-in link has been sent.<br>
+        <span style="font-size:13px;opacity:.8">You can close this tab after clicking the link.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!--  LOADING OVERLAY -->
+<!-- ══════════════════════════════════════════ -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="loading-card">
+    <span class="load-icon">📚</span>
+    <div class="load-text">Loading your book club…</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!--  MAIN APP SHELL -->
+<!-- ══════════════════════════════════════════ -->
+<div class="shell" id="app-shell" style="display:none">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-icon">📚</span>
+      <div class="brand-name">The Book Club</div>
+      <div class="brand-sub">Est. 2025</div>
+    </div>
+    <nav class="nav">
+      <a class="nav-item active" onclick="showTab('meetup')" data-tab="meetup">
+        <span class="nav-icon">📅</span> Next Meetup
+      </a>
+      <a class="nav-item" onclick="showTab('vote')" data-tab="vote">
+        <span class="nav-icon">🗳️</span> Vote for Next
+        <span class="nav-badge" id="vote-badge" style="display:none">0</span>
+      </a>
+      <a class="nav-item" onclick="showTab('history')" data-tab="history">
+        <span class="nav-icon">📜</span> History
+      </a>
+      <a class="nav-item" onclick="showTab('admin')" data-tab="admin" id="admin-nav-item" style="display:none">
+        <span class="nav-icon">⚙️</span> Admin
+      </a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="user-pill" onclick="showTab('profile')">
+        <div class="user-avatar" id="sidebar-avatar">?</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-name">Loading…</div>
+          <div class="user-role" id="sidebar-role">member</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- ── MEETUP TAB ── -->
+    <div class="page active" id="tab-meetup">
+      <div class="page-header">
+        <div class="page-title">Next Meetup</div>
+        <div class="page-sub">Upcoming session details</div>
+      </div>
+      <div class="page-body">
+        <div id="meetup-hero-wrap">
+          <div class="meetup-hero">
+            <div class="meetup-label">Next Meeting</div>
+            <div class="meetup-date" id="meetup-date-display">Not yet set</div>
+            <div class="meetup-date-sub" id="meetup-time-display"></div>
+            <div class="meetup-countdown" id="meetup-countdown"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <span class="card-icon">📖</span>
+            <span class="card-title">Current Book</span>
+          </div>
+          <div class="card-body">
+            <div id="current-book-display">
+              <div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">No book set yet</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card" id="meetup-edit-card" style="display:none">
+          <div class="card-head">
+            <span class="card-icon">✏️</span>
+            <span class="card-title">Edit Meetup Details</span>
+            <span class="card-badge">Admin</span>
+          </div>
+          <div class="card-body">
+            <div class="field">
+              <label class="label">Meetup Date</label>
+              <input class="input" id="edit-meetup-date" type="date">
+            </div>
+            <div class="field">
+              <label class="label">Time (optional)</label>
+              <input class="input" id="edit-meetup-time" type="time">
+            </div>
+            <div class="field">
+              <label class="label">Location (optional)</label>
+              <input class="input" id="edit-meetup-location" type="text" placeholder="e.g. Sarah's place, 14 Oak St">
+            </div>
+            <div class="divider" style="margin:14px 0"></div>
+            <div class="section-title" style="font-size:16px;margin-bottom:10px">Current Book</div>
+            <div class="field">
+              <label class="label">Book Title</label>
+              <input class="input" id="edit-book-title" type="text" placeholder="Title of the book">
+            </div>
+            <div class="field">
+              <label class="label">Author</label>
+              <input class="input" id="edit-book-author" type="text" placeholder="Author name">
+            </div>
+            <div class="field">
+              <label class="label">Pages</label>
+              <input class="input" id="edit-book-pages" type="number" placeholder="e.g. 340">
+            </div>
+            <div id="save-meetup-alert" class="alert" style="display:none"></div>
+            <div class="flex-row">
+              <button class="btn btn-amber" onclick="saveMeetupDetails()">Save Changes</button>
+              <button class="btn btn-outline" onclick="archiveCurrentBook()" style="margin-left:auto" title="Move current book to history and reset votes">📜 Archive & Reset Votes</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <span class="card-icon">📍</span>
+            <span class="card-title">Location</span>
+          </div>
+          <div class="card-body">
+            <div id="meetup-location-display" style="font-size:15px;color:var(--ink2);font-style:italic">Not specified</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── VOTE TAB ── -->
+    <div class="page" id="tab-vote">
+      <div class="page-header">
+        <div class="flex-row" style="align-items:flex-start;gap:12px">
+          <div>
+            <div class="page-title">Vote for Next Read</div>
+            <div class="page-sub">Have your say on what we read next</div>
+          </div>
+          <button class="btn btn-outline btn-sm ml-auto" style="flex-shrink:0" onclick="openSuggestModal()">+ Suggest a book</button>
+        </div>
+      </div>
+      <div class="page-body">
+        <div id="votes-remaining-bar" class="votes-remaining">
+          <span>🗳️ Your votes:</span>
+          <div class="vote-dots" id="vote-dots"></div>
+          <span id="votes-left-text" style="font-size:13px;color:var(--ink3)"></span>
+        </div>
+        <div id="pending-review-section" style="display:none">
+          <div class="section-title">⏳ Awaiting Admin Approval</div>
+          <div id="pending-books-list"></div>
+          <hr class="divider">
+        </div>
+        <div class="section-title" id="approved-section-title">Books to Vote On</div>
+        <div id="vote-books-list">
+          <div class="empty-state"><div class="empty-icon">📚</div><div class="empty-text">No books proposed yet — suggest one!</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── HISTORY TAB ── -->
+    <div class="page" id="tab-history">
+      <div class="page-header">
+        <div class="page-title">Reading History</div>
+        <div class="page-sub">Books the club has read together</div>
+      </div>
+      <div class="page-body">
+        <div class="card">
+          <div class="card-body" id="history-list">
+            <div class="empty-state"><div class="empty-icon">📜</div><div class="empty-text">No history yet — your reading journey starts soon!</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ADMIN TAB ── -->
+    <div class="page" id="tab-admin">
+      <div class="page-header">
+        <div class="page-title">Admin</div>
+        <div class="page-sub">Manage members and book suggestions</div>
+      </div>
+      <div class="page-body">
+        <!-- Members card -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-icon">👥</span>
+            <span class="card-title">Members</span>
+            <button class="btn btn-outline btn-sm ml-auto" onclick="openInviteModal()">+ Invite member</button>
+          </div>
+          <div class="card-body" id="members-list">
+            <div class="empty-state"><div class="empty-icon">👤</div><div class="empty-text">No members yet</div></div>
+          </div>
+        </div>
+
+        <!-- Pending book approvals -->
+        <div class="card">
+          <div class="card-head">
+            <span class="card-icon">📬</span>
+            <span class="card-title">Pending Book Suggestions</span>
+            <span class="card-badge" id="pending-badge" style="display:none">0</span>
+          </div>
+          <div class="card-body" id="admin-pending-list">
+            <div class="empty-state"><div class="empty-icon">✅</div><div class="empty-text">No pending suggestions</div></div>
+          </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="card">
+          <div class="card-head"><span class="card-icon">⚙️</span><span class="card-title">Settings</span></div>
+          <div class="card-body">
+            <div class="field">
+              <label class="label">Club Name</label>
+              <div class="flex-row">
+                <input class="input" id="setting-club-name" type="text" placeholder="The Book Club" style="flex:1">
+                <button class="btn btn-outline btn-sm" onclick="saveSetting('club_name', document.getElementById('setting-club-name').value)">Save</button>
+              </div>
+            </div>
+            <div class="divider" style="margin:14px 0"></div>
+            <div class="flex-row">
+              <span style="font-size:14px;color:var(--ink2)">Disconnect Supabase</span>
+              <button class="btn btn-danger btn-sm ml-auto" onclick="disconnectSupabase()">Disconnect</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Mobile nav -->
+<div class="mobile-nav" id="mobile-nav" style="display:none">
+  <div class="mobile-nav-inner">
+    <button class="mob-nav-btn active" onclick="showTab('meetup')" data-tab="meetup">
+      <span class="mob-icon">📅</span> Meetup
+    </button>
+    <button class="mob-nav-btn" onclick="showTab('vote')" data-tab="vote">
+      <span class="mob-icon">🗳️</span> Vote
+      <span class="mob-badge" id="mob-vote-badge" style="display:none"></span>
+    </button>
+    <button class="mob-nav-btn" onclick="showTab('history')" data-tab="history">
+      <span class="mob-icon">📜</span> History
+    </button>
+    <button class="mob-nav-btn" onclick="showTab('admin')" data-tab="admin" id="admin-mob-item" style="display:none">
+      <span class="mob-icon">⚙️</span> Admin
+    </button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!--  MODALS -->
+<!-- ══════════════════════════════════════════ -->
+
+<!-- Suggest Book Modal -->
+<div class="overlay hidden" id="suggest-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">📚 Suggest a Book</div>
+      <button class="modal-close" onclick="closeModal('suggest-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label class="label">Search from Library List</label>
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="input" id="book-search-input" type="text" placeholder="Search by title or author…" oninput="searchBooks()" autocomplete="off">
+          <div class="search-results" id="book-search-results"></div>
+        </div>
+      </div>
+      <div style="text-align:center;font-size:13px;color:var(--ink3);margin:4px 0 12px;font-style:italic">— or enter manually —</div>
+      <div class="field">
+        <label class="label">Book Title</label>
+        <input class="input" id="suggest-title" type="text" placeholder="Title">
+      </div>
+      <div class="field">
+        <label class="label">Author</label>
+        <input class="input" id="suggest-author" type="text" placeholder="Author name">
+      </div>
+      <div class="field">
+        <label class="label">Pages (optional)</label>
+        <input class="input" id="suggest-pages" type="number" placeholder="e.g. 340">
+      </div>
+      <div id="suggest-error" class="alert alert-error" style="display:none"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('suggest-modal')">Cancel</button>
+      <button class="btn btn-amber" onclick="submitSuggestion()">Submit Suggestion</button>
+    </div>
+  </div>
+</div>
+
+<!-- Invite Member Modal -->
+<div class="overlay hidden" id="invite-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">✉️ Invite Member</div>
+      <button class="modal-close" onclick="closeModal('invite-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="alert alert-info">An invitation email will be sent with a magic sign-in link.</div>
+      <div class="field">
+        <label class="label">Name</label>
+        <input class="input" id="invite-name" type="text" placeholder="First name">
+      </div>
+      <div class="field">
+        <label class="label">Email</label>
+        <input class="input" id="invite-email" type="email" placeholder="email@example.com">
+      </div>
+      <div class="field">
+        <label class="label">Role</label>
+        <select class="select" id="invite-role">
+          <option value="user">Member</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <div id="invite-error" class="alert alert-error" style="display:none"></div>
+      <div id="invite-success" class="alert alert-success" style="display:none"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('invite-modal')">Cancel</button>
+      <button class="btn btn-amber" onclick="sendInvite()">Send Invite</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Member Modal -->
+<div class="overlay hidden" id="edit-member-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Edit Member</div>
+      <button class="modal-close" onclick="closeModal('edit-member-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label class="label">Name</label>
+        <input class="input" id="edit-member-name" type="text">
+      </div>
+      <div class="field">
+        <label class="label">Role</label>
+        <select class="select" id="edit-member-role">
+          <option value="user">Member</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+      <input type="hidden" id="edit-member-id">
+      <div id="edit-member-error" class="alert alert-error" style="display:none"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-danger btn-sm" onclick="removeMember()">Remove Member</button>
+      <button class="btn btn-outline ml-auto" onclick="closeModal('edit-member-modal')">Cancel</button>
+      <button class="btn btn-amber" onclick="saveMemberEdit()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!--  SCRIPTS -->
+<!-- ══════════════════════════════════════════ -->
+<script>
+// ── STATE ──
+let SB = null;       // supabase client
+let currentUser = null;
+let currentMember = null;
+let allMembers = [];
+let proposedBooks = [];
+let myVotes = [];
+let historyBooks = [];
+let settings = {};
+let realtimeSubs = [];
+const MAX_VOTES = 3;
+
+// ── BOOK LIBRARY (from PDF) ──
+const BOOK_LIBRARY = [{"title": "The Bronze Horseman", "author": "Paullina Simons", "pages": 664},
+{"title": "The Cancer Finishing School", "author": "Peter Goldsworthy", "pages": 318},
+{"title": "Case Histories", "author": "Kate Atkinson", "pages": 411},
+{"title": "Death at the Sign of the Rook", "author": "Kate Atkinson", "pages": 449},
+{"title": "Devil's Kitchen", "author": "Candice Fox", "pages": 449},
+{"title": "Everyone This Christmas Has a Secret", "author": "Benjamin Stevenson", "pages": 228},
+{"title": "Here One Moment", "author": "Liane Moriarty", "pages": 505},
+{"title": "One Good Turn", "author": "Kate Atkinson", "pages": 526},
+{"title": "Rules of Civility", "author": "Amor Towles", "pages": 335},
+{"title": "Station Eleven", "author": "Emily St. John Mandel", "pages": 333},
+{"title": "After Story", "author": "Larissa Behrendt", "pages": 307},
+{"title": "Bila Yarrudhanggalangdhuray", "author": "Anita Heiss", "pages": 393},
+{"title": "Boy Swallows Universe", "author": "Trent Dalton", "pages": 474},
+{"title": "The Bridge", "author": "Enza Gandolfo", "pages": 384},
+{"title": "Chai Time at Cinnamon Gardens", "author": "Shankari Chandran", "pages": 360},
+{"title": "The Children", "author": "Charlotte Wood", "pages": 269},
+{"title": "The Choke", "author": "Sofie Laguna", "pages": 371},
+{"title": "Daughter of Bad Times", "author": "Rohan Wilson", "pages": 336},
+{"title": "The Deed", "author": "Susannah Begbie", "pages": 374},
+{"title": "The Dressmakers of Yarrandarrah Prison", "author": "Meredith Jaffe", "pages": 359},
+{"title": "The Eye of the Sheep", "author": "Sofie Laguna", "pages": 308},
+{"title": "The Geography of Friendship", "author": "Sally Piper", "pages": 240},
+{"title": "Ghost River", "author": "Tony Birch", "pages": 294},
+{"title": "Happy Valley", "author": "Patrick White", "pages": 407},
+{"title": "Indelible Ink", "author": "Fiona McGregor", "pages": 425},
+{"title": "The Labyrinth: A Pastoral", "author": "Amanda Lohrey", "pages": 246},
+{"title": "The Life to Come", "author": "Michelle de Kretser", "pages": 375},
+{"title": "Lola in the Mirror", "author": "Trent Dalton", "pages": 496},
+{"title": "The Lost Flowers of Alice Hart", "author": "Holly Ringland", "pages": 388},
+{"title": "The Masterpiece", "author": "Judy Waugh", "pages": 347},
+{"title": "Midnight Empire", "author": "Andrew Croom", "pages": 241},
+{"title": "The Natural Way of Things", "author": "Charlotte Wood", "pages": 315},
+{"title": "One Foot Wrong", "author": "Sofie Laguna", "pages": 249},
+{"title": "The Performance", "author": "Claire Thomas", "pages": 297},
+{"title": "Restless Dolly Maunder", "author": "Kate Grenville", "pages": 242},
+{"title": "The Rip", "author": "Robert Drewe", "pages": 240},
+{"title": "The Roland Medals", "author": "Maureen Cashman", "pages": 320},
+{"title": "A Sand Archive", "author": "Gregory Day", "pages": 304},
+{"title": "The Shepherd's Hut", "author": "Tim Winton", "pages": 266},
+{"title": "The Spare Room", "author": "Helen Garner", "pages": 195},
+{"title": "Too Much Lip", "author": "Melissa Lucashenko", "pages": 328},
+{"title": "The True Story of Maddie Bright", "author": "Mary Rose MacColl", "pages": 504},
+{"title": "The Watch Tower", "author": "Elizabeth Harrower", "pages": 335},
+{"title": "The White Girl", "author": "Tony Birch", "pages": 265},
+{"title": "The Year of the Farmer", "author": "Rosalie Ham", "pages": 325},
+{"title": "The Yellow House", "author": "Emily O'Grady", "pages": 314},
+{"title": "1984", "author": "George Orwell", "pages": 325},
+{"title": "The Bell Jar", "author": "Sylvia Plath", "pages": 234},
+{"title": "Brave New World", "author": "Aldous Huxley", "pages": 229},
+{"title": "Careful, He Might Hear You", "author": "Sumner Locke Elliott", "pages": 495},
+{"title": "Cold Comfort Farm", "author": "Stella Gibbons", "pages": 232},
+{"title": "The Collector", "author": "John Fowles", "pages": 282},
+{"title": "Dune", "author": "Frank Herbert", "pages": 592},
+{"title": "Emma", "author": "Jane Austen", "pages": 498},
+{"title": "The First Man", "author": "Albert Camus", "pages": 261},
+{"title": "The Five People You Meet in Heaven", "author": "Mitch Albom", "pages": 230},
+{"title": "Go Set a Watchman", "author": "Harper Lee", "pages": 278},
+{"title": "The Handmaid's Tale", "author": "Margaret Atwood", "pages": 324},
+{"title": "Heart of Darkness", "author": "Joseph Conrad", "pages": 136},
+{"title": "Housekeeping", "author": "Marilynne Robinson", "pages": 219},
+{"title": "Love in the Time of Cholera", "author": "Gabriel Garcia Marquez", "pages": 368},
+{"title": "Madame Bovary", "author": "Gustave Flaubert", "pages": 342},
+{"title": "The Testaments", "author": "Margaret Atwood", "pages": 419},
+{"title": "To Kill a Mockingbird", "author": "Harper Lee", "pages": 323},
+{"title": "The Unbearable Lightness of Being", "author": "Milan Kundera", "pages": 314},
+{"title": "The Woman in White", "author": "Wilkie Collins", "pages": 502},
+{"title": "The Year of the Flood", "author": "Margaret Atwood", "pages": 434},
+{"title": "About Grace", "author": "Anthony Doerr", "pages": 412},
+{"title": "The Age of Miracles", "author": "Karen Thompson Walker", "pages": 373},
+{"title": "Animal People", "author": "Charlotte Wood", "pages": 264},
+{"title": "Anything is Possible", "author": "Elizabeth Strout", "pages": 254},
+{"title": "Being There", "author": "Jerzy Kosinski", "pages": 142},
+{"title": "Bel Canto", "author": "Ann Patchett", "pages": 318},
+{"title": "The Children Act", "author": "Ian McEwan", "pages": 215},
+{"title": "Crossing to Safety", "author": "Wallace Stegner", "pages": 327},
+{"title": "Demon Copperhead", "author": "Barbara Kingsolver", "pages": 548},
+{"title": "Eleanor Oliphant Is Completely Fine", "author": "Gail Honeyman", "pages": 386},
+{"title": "The Elegance of the Hedgehog", "author": "Muriel Barbery", "pages": 320},
+{"title": "Exit West", "author": "Mohsin Hamid", "pages": 228},
+{"title": "The Finkler Question", "author": "Howard Jacobson", "pages": 307},
+{"title": "Fourteen Days", "author": "Douglas Preston", "pages": 363},
+{"title": "A Fraction of the Whole", "author": "Steve Toltz", "pages": 711},
+{"title": "Funny Story", "author": "Emily Henry", "pages": 387},
+{"title": "The Gathering", "author": "Anne Enright", "pages": 261},
+{"title": "Girl, Woman, Other", "author": "Bernardine Evaristo", "pages": 480},
+{"title": "The Herd", "author": "Emily Edwards", "pages": 342},
+{"title": "History of the Rain", "author": "Niall Williams", "pages": 368},
+{"title": "Home Fire", "author": "Kamila Shamsie", "pages": 264},
+{"title": "The Infinities", "author": "John Banville", "pages": 299},
+{"title": "The Island of Missing Trees", "author": "Elif Shafak", "pages": 353},
+{"title": "The Jane Austen Remedy", "author": "Ruth Wilson", "pages": 309},
+{"title": "Lies and Weddings", "author": "Kevin Kwan", "pages": 437},
+{"title": "Machines Like Me", "author": "Ian McEwan", "pages": 305},
+{"title": "A Man Called Ove", "author": "Fredrik Backman", "pages": 295},
+{"title": "The Midnight Library", "author": "Matt Haig", "pages": 288},
+{"title": "The Ministry of Utmost Happiness", "author": "Arundhati Roy", "pages": 464},
+{"title": "My Dark Vanessa", "author": "Kate Elizabeth Russell", "pages": 372},
+{"title": "Normal People", "author": "Sally Rooney", "pages": 266},
+{"title": "The Other Bridget", "author": "Rachael Johns", "pages": 490},
+{"title": "Our Missing Hearts", "author": "Celeste Ng", "pages": 335},
+{"title": "Our Souls at Night", "author": "Kent Haruf", "pages": 179},
+{"title": "The Overstory", "author": "Richard Powers", "pages": 502},
+{"title": "A Pale View of Hills", "author": "Kazuo Ishiguro", "pages": 183},
+{"title": "The Paper Palace", "author": "Miranda Cowley Heller", "pages": 389},
+{"title": "People of the Book", "author": "Geraldine Brooks", "pages": 390},
+{"title": "The Price of Salt", "author": "Patricia Highsmith", "pages": 224},
+{"title": "Prophet Song", "author": "Paul Lynch", "pages": 309},
+{"title": "Remember Me", "author": "Charity Norman", "pages": 306},
+{"title": "The Road", "author": "Cormac McCarthy", "pages": 307},
+{"title": "The Rosie Project", "author": "Graeme Simsion", "pages": 329},
+{"title": "The Scent Keeper", "author": "Erica Bauermeister", "pages": 313},
+{"title": "The Sellout", "author": "Paul Beatty", "pages": 288},
+{"title": "The Sense of an Ending", "author": "Julian Barnes", "pages": 150},
+{"title": "Still Alice", "author": "Lisa Genova", "pages": 237},
+{"title": "Tom Lake", "author": "Ann Patchett", "pages": 309},
+{"title": "The Unchangeable Spots of Leopards", "author": "Kristopher Jansma", "pages": 254},
+{"title": "The Unlikely Pilgrimage of Harold Fry", "author": "Rachel Joyce", "pages": 295},
+{"title": "When We Were Birds", "author": "Ayanna Lloyd Banwo", "pages": 278},
+{"title": "Woman, Eating", "author": "Claire Kohda", "pages": 248},
+{"title": "After She Left", "author": "Penelope Hanley", "pages": 340},
+{"title": "All That I Am", "author": "Anna Funder", "pages": 369},
+{"title": "All the Light We Cannot See", "author": "Anthony Doerr", "pages": 530},
+{"title": "The Bass Rock", "author": "Evie Wyld", "pages": 355},
+{"title": "The Beekeeper of Aleppo", "author": "Christy Lefteri", "pages": 378},
+{"title": "The Boat", "author": "Nam Le", "pages": 315},
+{"title": "The Bookbinder of Jericho", "author": "Pip Williams", "pages": 438},
+{"title": "Bring Up the Bodies", "author": "Hilary Mantel", "pages": 411},
+{"title": "The Buried Giant", "author": "Kazuo Ishiguro", "pages": 345},
+{"title": "The Calculating Stars", "author": "Mary Robinette Kowal", "pages": 384},
+{"title": "Circe", "author": "Madeline Miller", "pages": 352},
+{"title": "City of Girls", "author": "Elizabeth Gilbert", "pages": 480},
+{"title": "Damascus", "author": "Christos Tsiolkas", "pages": 440},
+{"title": "Desire Lines", "author": "Felicity Volk", "pages": 440},
+{"title": "The Dickens Boy", "author": "Tom Keneally", "pages": 392},
+{"title": "The Dictionary of Lost Words", "author": "Pip Williams", "pages": 423},
+{"title": "The Dressmaker", "author": "Rosalie Ham", "pages": 296},
+{"title": "The Dutch House", "author": "Ann Patchett", "pages": 352},
+{"title": "The Enlightenment of the Greengage Tree", "author": "Shokoofeh Azar", "pages": 272},
+{"title": "A Gentleman in Moscow", "author": "Amor Towles", "pages": 462},
+{"title": "The Girl with the Violin", "author": "Shelley Davidow", "pages": 430},
+{"title": "A God in Ruins", "author": "Kate Atkinson", "pages": 394},
+{"title": "The Good People", "author": "Hannah Kent", "pages": 400},
+{"title": "The Grass Castle", "author": "Karen Viggers", "pages": 407},
+{"title": "Home", "author": "Marilynne Robinson", "pages": 325},
+{"title": "The Last Painting of Sara de Vos", "author": "Dominic Smith", "pages": 374},
+{"title": "The Lieutenant", "author": "Kate Grenville", "pages": 307},
+{"title": "Life After Life", "author": "Kate Atkinson", "pages": 477},
+{"title": "The Lincoln Highway", "author": "Amor Towles", "pages": 576},
+{"title": "Lincoln in the Bardo", "author": "George Saunders", "pages": 341},
+{"title": "My Brilliant Friend", "author": "Elena Ferrante", "pages": 345},
+{"title": "The Narrow Road to the Deep North", "author": "Richard Flanagan", "pages": 467},
+{"title": "The Night Tiger", "author": "Yangsze Choo", "pages": 480},
+{"title": "The Night Watchman", "author": "Louise Erdrich", "pages": 451},
+{"title": "No Great Mischief", "author": "Alistair MacLeod", "pages": 262},
+{"title": "The Promise", "author": "Damon Galgut", "pages": 269},
+{"title": "A Room Made of Leaves", "author": "Kate Grenville", "pages": 321},
+{"title": "Sarah Thornhill", "author": "Kate Grenville", "pages": 307},
+{"title": "Shuggie Bain", "author": "Douglas Stuart", "pages": 430},
+{"title": "The Story of a New Name", "author": "Elena Ferrante", "pages": 471},
+{"title": "The Sympathizer", "author": "Viet Thanh Nguyen", "pages": 371},
+{"title": "The Tattooist of Auschwitz", "author": "Heather Morris", "pages": 277},
+{"title": "The Tiger's Wife", "author": "Tea Obreht", "pages": 335},
+{"title": "The Underground Railroad", "author": "Colson Whitehead", "pages": 306},
+{"title": "Women Talking", "author": "Miriam Toews", "pages": 216},
+{"title": "All the Birds, Singing", "author": "Evie Wyld", "pages": 229},
+{"title": "Anxious People", "author": "Fredrik Backman", "pages": 339},
+{"title": "Before the Fall", "author": "Noah Hawley", "pages": 390},
+{"title": "Big Little Lies", "author": "Liane Moriarty", "pages": 471},
+{"title": "The Bullet That Missed", "author": "Richard Osman", "pages": 412},
+{"title": "The Cuckoo's Calling", "author": "Robert Galbraith", "pages": 449},
+{"title": "The Dark Lake", "author": "Sarah Bailey", "pages": 431},
+{"title": "Death on the Nile", "author": "Agatha Christie", "pages": 384},
+{"title": "The Dry", "author": "Jane Harper", "pages": 342},
+{"title": "Eight Lives", "author": "Susan Hurley", "pages": 384},
+{"title": "Everyone on This Train Is a Suspect", "author": "Benjamin Stevenson", "pages": 318},
+{"title": "Force of Nature", "author": "Jane Harper", "pages": 380},
+{"title": "The Girl on the Train", "author": "Paula Hawkins", "pages": 316},
+{"title": "I Have Some Questions For You", "author": "Rebecca Makkai", "pages": 438},
+{"title": "The Last Dance", "author": "Mark Billingham", "pages": 390},
+{"title": "Little Fires Everywhere", "author": "Celeste Ng", "pages": 338},
+{"title": "The Lost Man", "author": "Jane Harper", "pages": 362},
+{"title": "The Maid", "author": "Nita Prose", "pages": 343},
+{"title": "The New York Trilogy", "author": "Paul Auster", "pages": 314},
+{"title": "The Night Guest", "author": "Fiona McFarlane", "pages": 275},
+{"title": "The Rich Man's House", "author": "Andrew McGahan", "pages": 608},
+{"title": "The Seven Moons of Maali Almeida", "author": "Shehan Karunatilaka", "pages": 386},
+{"title": "The Silkworm", "author": "Robert Galbraith", "pages": 455},
+{"title": "The Snow Kimono", "author": "Mark Henshaw", "pages": 396},
+{"title": "The Soulmate", "author": "Sally Hepworth", "pages": 311},
+{"title": "The Survivors", "author": "Jane Harper", "pages": 378},
+{"title": "The Thursday Murder Club", "author": "Richard Osman", "pages": 380},
+{"title": "The Tilt", "author": "Chris Hammer", "pages": 473},
+{"title": "What Happened to Nina?", "author": "Dervla McTiernan", "pages": 322},
+{"title": "The Woman in the Window", "author": "A.J. Finn", "pages": 427},
+{"title": "21 Lessons for the 21st Century", "author": "Yuval Noah Harari", "pages": 368},
+{"title": "Agatha Christie: A Very Elusive Woman", "author": "Lucy Worsley", "pages": 415},
+{"title": "Am I Black Enough for You?", "author": "Anita Heiss", "pages": 356},
+{"title": "Band-Aid for a Broken Leg", "author": "Damien Brown", "pages": 344},
+{"title": "Behind the Beautiful Forevers", "author": "Katherine Boo", "pages": 256},
+{"title": "Bright Shining", "author": "Julia Baird", "pages": 306},
+{"title": "Chasing Bohemia", "author": "Carmen Michael", "pages": 256},
+{"title": "Conversations with RBG", "author": "Jeffrey Rosen", "pages": 259},
+{"title": "The Court Reporter", "author": "Jamelle Wells", "pages": 309},
+{"title": "Dark Emu", "author": "Bruce Pascoe", "pages": 277},
+{"title": "Don't Be Too Polite, Girls", "author": "Wendy McCarthy", "pages": 507},
+{"title": "Everywhere I Look", "author": "Helen Garner", "pages": 272},
+{"title": "The Feel of Steel", "author": "Helen Garner", "pages": 223},
+{"title": "The Fire of Joy", "author": "Clive James", "pages": 309},
+{"title": "Foreign Correspondence", "author": "Geraldine Brooks", "pages": 244},
+{"title": "Four Sisters: The Lost Lives of the Romanov Grand Duchesses", "author": "Helen Rappaport", "pages": 492},
+{"title": "Ghost Empire", "author": "Richard Fidler", "pages": 492},
+{"title": "The Good Life: What Makes a Life Worth Living?", "author": "Hugh Mackay", "pages": 364},
+{"title": "Growing up Aboriginal in Australia", "author": "Anita Heiss", "pages": 311},
+{"title": "Growing Up Queer in Australia", "author": "Benjamin Law", "pages": 340},
+{"title": "The Hare with Amber Eyes", "author": "Edmund de Waal", "pages": 354},
+{"title": "How Many More Women?", "author": "Keina Yoshida", "pages": 408},
+{"title": "I'm Glad My Mom Died", "author": "Jennette McCurdy", "pages": 304},
+{"title": "Invisible Women", "author": "Caroline Criado-Perez", "pages": 411},
+{"title": "Killing for Country", "author": "David Marr", "pages": 468},
+{"title": "The Library Book", "author": "Susan Orlean", "pages": 336},
+{"title": "A Long Way Home (Lion)", "author": "Saroo Brierley", "pages": 261},
+{"title": "My Dream Time", "author": "Ash Barty", "pages": 353},
+{"title": "The Ninth Life of a Diamond Miner", "author": "Grace Tame", "pages": 342},
+{"title": "No Friend but the Mountains", "author": "Behrouz Boochani", "pages": 374},
+{"title": "None of the Above", "author": "Travis Alabanza", "pages": 214},
+{"title": "Not Now, Not Ever", "author": "Julia Gillard", "pages": 236},
+{"title": "One Life: My Mother's Story", "author": "Kate Grenville", "pages": 260},
+{"title": "Permanent Record", "author": "Edward Snowden", "pages": 352},
+{"title": "Question 7", "author": "Richard Flanagan", "pages": 386},
+{"title": "Saving Time", "author": "Jenny Odell", "pages": 364},
+{"title": "The Stranger in the Woods", "author": "Michael Finkel", "pages": 203},
+{"title": "The Tall Man", "author": "Chloe Hooper", "pages": 258},
+{"title": "Three Women", "author": "Lisa Taddeo", "pages": 306},
+{"title": "A Time of Gifts", "author": "Patrick Leigh Fermor", "pages": 321},
+{"title": "Twelve Years a Slave", "author": "Solomon Northup", "pages": 240},
+{"title": "Underland: A Deep Time Journey", "author": "Robert Macfarlane", "pages": 487},
+{"title": "When Breath Becomes Air", "author": "Paul Kalanithi", "pages": 228},
+{"title": "White Fragility", "author": "Robin DiAngelo", "pages": 168},
+{"title": "The Wife Drought", "author": "Annabel Crabb", "pages": 282},
+{"title": "The Woman in Me", "author": "Britney Spears", "pages": 277},
+{"title": "Your Own Kind of Girl", "author": "Clare Bowditch", "pages": 352}];
+
+// ── AVATAR COLORS ──
+const AVATAR_COLORS = ['#c47c2b','#2d4a35','#8b3a4a','#4a3780','#1d5a7a','#6a4520','#3a6b4a','#7a3a5a'];
+
+// ── UTILS ──
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).substr(2,6) }
+function avatarInitials(name){ return name ? name.split(' ').map(w=>w[0]).join('').toUpperCase().substr(0,2) : '?' }
+function fmtDate(d){
+  if(!d) return '';
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString('en-AU', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+function fmtDateShort(d){
+  if(!d) return '';
+  const dt = new Date(d + 'T00:00:00');
+  return dt.toLocaleDateString('en-AU', {day:'numeric',month:'short',year:'numeric'});
+}
+function countdown(dateStr){
+  if(!dateStr) return '';
+  const now = new Date(); now.setHours(0,0,0,0);
+  const then = new Date(dateStr + 'T00:00:00');
+  const diff = Math.round((then - now) / 86400000);
+  if(diff < 0) return `${Math.abs(diff)} days ago`;
+  if(diff === 0) return 'Today!';
+  if(diff === 1) return 'Tomorrow!';
+  return `${diff} days away`;
+}
+function showAlert(id, msg, type='error'){
+  const el = document.getElementById(id);
+  el.className = `alert alert-${type}`;
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+function hideAlert(id){ document.getElementById(id).style.display='none' }
+
+// ── SUPABASE INIT ──
+async function loadSupabase(){
+  const cfg = getConfig();
+  if(!cfg) return null;
+  return window.createSupabaseClient(cfg.url, cfg.key);
+}
+function getConfig(){
+  try{ return JSON.parse(localStorage.getItem('bookclub_sb_config')) }
+  catch{ return null }
+}
+function saveConfig(url, key){ localStorage.setItem('bookclub_sb_config', JSON.stringify({url,key})) }
+function clearConfig(){ localStorage.removeItem('bookclub_sb_config') }
+
+async function initApp(){
+  // Load Supabase JS
+  await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js');
+  
+  const cfg = getConfig();
+  if(!cfg){
+    document.getElementById('loading-overlay').style.display='none';
+    document.getElementById('setup-screen').style.display='flex';
+    return;
+  }
+  
+  try{
+    SB = window.supabase.createClient(cfg.url, cfg.key);
+    
+    // Check for magic link hash
+    const { data: { session } } = await SB.auth.getSession();
+    
+    if(!session){
+      document.getElementById('loading-overlay').style.display='none';
+      document.getElementById('login-screen').style.display='flex';
+      return;
+    }
+    
+    currentUser = session.user;
+    await loadMemberProfile();
+    
+    if(!currentMember){
+      // User authenticated but no member record — might be first admin
+      document.getElementById('loading-overlay').style.display='none';
+      document.getElementById('login-screen').style.display='flex';
+      return;
+    }
+    
+    await bootApp();
+    
+  } catch(e){
+    console.error(e);
+    document.getElementById('loading-overlay').style.display='none';
+    document.getElementById('setup-screen').style.display='flex';
+  }
+  
+  // Listen for auth changes (magic link)
+  if(SB) SB.auth.onAuthStateChange(async (event, session) => {
+    if(event === 'SIGNED_IN' && session && !currentUser){
+      currentUser = session.user;
+      document.getElementById('login-screen').style.display='none';
+      document.getElementById('loading-overlay').style.display='flex';
+      await loadMemberProfile();
+      if(currentMember){
+        await bootApp();
+      } else {
+        document.getElementById('loading-overlay').style.display='none';
+        showNoMemberMessage();
+      }
+    }
+  });
+}
+
+function showNoMemberMessage(){
+  document.getElementById('login-screen').style.display='flex';
+  const hint = document.querySelector('.login-hint');
+  hint.textContent = 'Your account exists but you haven\'t been added to this club yet. Please ask an admin to add you.';
+}
+
+function loadScript(src){
+  return new Promise((res,rej)=>{
+    if(document.querySelector(`script[src="${src}"]`)){ res(); return; }
+    const s = document.createElement('script');
+    s.src = src; s.onload=res; s.onerror=rej;
+    document.head.appendChild(s);
+  });
+}
+
+async function loadMemberProfile(){
+  const { data } = await SB.from('members').select('*').eq('id', currentUser.id).single();
+  currentMember = data;
+}
+
+async function bootApp(){
+  document.getElementById('loading-overlay').style.display='none';
+  document.getElementById('app-shell').style.display='flex';
+  
+  if(window.innerWidth <= 680){
+    document.getElementById('mobile-nav').style.display='block';
+  }
+  
+  // Show admin nav if admin
+  if(currentMember.role === 'admin'){
+    document.getElementById('admin-nav-item').style.display='flex';
+    document.getElementById('admin-mob-item').style.display='flex';
+    document.getElementById('meetup-edit-card').style.display='block';
+  }
+  
+  // Set sidebar user info
+  document.getElementById('sidebar-name').textContent = currentMember.name;
+  document.getElementById('sidebar-role').textContent = currentMember.role === 'admin' ? 'Admin' : 'Member';
+  const av = document.getElementById('sidebar-avatar');
+  av.textContent = avatarInitials(currentMember.name);
+  av.style.background = currentMember.avatar_color || AVATAR_COLORS[0];
+  
+  // Load all data
+  await Promise.all([loadSettings(), loadProposedBooks(), loadMyVotes(), loadHistory(), loadMembers()]);
+  
+  renderMeetup();
+  renderVoteTab();
+  renderHistory();
+  renderAdmin();
+  
+  setupRealtime();
+}
+
+// ── DATA LOADING ──
+async function loadSettings(){
+  const { data } = await SB.from('club_settings').select('*');
+  settings = {};
+  (data||[]).forEach(r => settings[r.key] = r.value);
+}
+async function loadProposedBooks(){
+  const { data } = await SB.from('proposed_books').select('*, votes(count)').order('created_at');
+  proposedBooks = data || [];
+}
+async function loadMyVotes(){
+  const { data } = await SB.from('votes').select('*').eq('member_id', currentMember.id);
+  myVotes = (data||[]).map(v => v.book_id);
+}
+async function loadHistory(){
+  const { data } = await SB.from('history').select('*').order('read_date', {ascending:false});
+  historyBooks = data || [];
+}
+async function loadMembers(){
+  const { data } = await SB.from('members').select('*').order('created_at');
+  allMembers = data || [];
+}
+
+// ── REALTIME ──
+function setupRealtime(){
+  const ch = SB.channel('bookclub-changes')
+    .on('postgres_changes', {event:'*', schema:'public', table:'club_settings'}, async () => {
+      await loadSettings(); renderMeetup();
+    })
+    .on('postgres_changes', {event:'*', schema:'public', table:'proposed_books'}, async () => {
+      await loadProposedBooks(); await loadMyVotes(); renderVoteTab(); renderAdmin();
+    })
+    .on('postgres_changes', {event:'*', schema:'public', table:'votes'}, async () => {
+      await loadProposedBooks(); await loadMyVotes(); renderVoteTab();
+    })
+    .on('postgres_changes', {event:'*', schema:'public', table:'history'}, async () => {
+      await loadHistory(); renderHistory();
+    })
+    .on('postgres_changes', {event:'*', schema:'public', table:'members'}, async () => {
+      await loadMembers(); renderAdmin();
+    })
+    .subscribe();
+  realtimeSubs.push(ch);
+}
+
+// ── TAB NAVIGATION ──
+function showTab(tab){
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item, .mob-nav-btn').forEach(n => n.classList.remove('active'));
+  
+  const page = document.getElementById('tab-'+tab);
+  if(page) page.classList.add('active');
+  
+  document.querySelectorAll(`[data-tab="${tab}"]`).forEach(n => n.classList.add('active'));
+}
+
+// ── MEETUP RENDER ──
+function renderMeetup(){
+  const dateStr = settings['meetup_date'];
+  const timeStr = settings['meetup_time'];
+  const location = settings['meetup_location'];
+  const bookTitle = settings['current_book_title'];
+  const bookAuthor = settings['current_book_author'];
+  const bookPages = settings['current_book_pages'];
+  
+  // Date display
+  if(dateStr){
+    document.getElementById('meetup-date-display').textContent = fmtDate(dateStr);
+    document.getElementById('meetup-time-display').textContent = timeStr ? formatTime(timeStr) : '';
+    document.getElementById('meetup-countdown').innerHTML = `🏃 ${countdown(dateStr)}`;
+  } else {
+    document.getElementById('meetup-date-display').textContent = 'Not yet set';
+    document.getElementById('meetup-time-display').textContent = '';
+    document.getElementById('meetup-countdown').textContent = '';
+  }
+  
+  // Location
+  document.getElementById('meetup-location-display').textContent = location || 'Not specified';
+  
+  // Book display
+  const bookWrap = document.getElementById('current-book-display');
+  if(bookTitle){
+    bookWrap.innerHTML = `
+      <div class="book-hero">
+        <div class="book-spine">📖</div>
+        <div class="book-info">
+          <div class="book-info-label">Currently Reading</div>
+          <div class="book-info-title">${esc(bookTitle)}</div>
+          <div class="book-info-author">${esc(bookAuthor||'')}</div>
+          ${bookPages ? `<div class="book-info-pages">📄 ${bookPages} pages</div>` : ''}
+        </div>
+      </div>`;
+  } else {
+    bookWrap.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">No book set yet</div></div>';
+  }
+  
+  // Populate edit fields if admin
+  if(currentMember && currentMember.role === 'admin'){
+    document.getElementById('edit-meetup-date').value = dateStr || '';
+    document.getElementById('edit-meetup-time').value = timeStr || '';
+    document.getElementById('edit-meetup-location').value = location || '';
+    document.getElementById('edit-book-title').value = bookTitle || '';
+    document.getElementById('edit-book-author').value = bookAuthor || '';
+    document.getElementById('edit-book-pages').value = bookPages || '';
+  }
+}
+
+function formatTime(t){
+  if(!t) return '';
+  const [h,m] = t.split(':');
+  const hour = parseInt(h);
+  const ampm = hour >= 12 ? 'pm' : 'am';
+  const h12 = hour % 12 || 12;
+  return `${h12}:${m} ${ampm}`;
+}
+
+async function saveMeetupDetails(){
+  const date = document.getElementById('edit-meetup-date').value;
+  const time = document.getElementById('edit-meetup-time').value;
+  const location = document.getElementById('edit-meetup-location').value;
+  const title = document.getElementById('edit-book-title').value.trim();
+  const author = document.getElementById('edit-book-author').value.trim();
+  const pages = document.getElementById('edit-book-pages').value;
+  
+  const updates = [
+    {key:'meetup_date', value:date},
+    {key:'meetup_time', value:time},
+    {key:'meetup_location', value:location},
+    {key:'current_book_title', value:title},
+    {key:'current_book_author', value:author},
+    {key:'current_book_pages', value:pages},
+  ];
+  
+  for(const u of updates){
+    await SB.from('club_settings').upsert(u);
+  }
+  
+  showAlert('save-meetup-alert', '✓ Saved successfully!', 'success');
+  setTimeout(()=>hideAlert('save-meetup-alert'), 3000);
+  await loadSettings();
+  renderMeetup();
+}
+
+async function archiveCurrentBook(){
+  const title = settings['current_book_title'];
+  const author = settings['current_book_author'];
+  const pages = settings['current_book_pages'];
+  const date = settings['meetup_date'];
+  
+  if(!title){ alert('No current book to archive.'); return; }
+  if(!confirm(`Archive "${title}" to history and reset all votes?`)) return;
+  
+  // Add to history
+  await SB.from('history').insert({
+    id: uid(),
+    title, author: author||'', pages: pages ? parseInt(pages) : null,
+    read_date: date || new Date().toISOString().split('T')[0],
+    meetup_date: date || null
+  });
+  
+  // Remove all votes
+  await SB.from('votes').delete().neq('id', 'NEVER');
+  
+  // Clear current book from settings
+  for(const key of ['current_book_title','current_book_author','current_book_pages']){
+    await SB.from('club_settings').upsert({key, value:''});
+  }
+  
+  // Remove from proposed list if it's there
+  const existing = proposedBooks.find(b => b.title.toLowerCase() === title.toLowerCase());
+  if(existing){
+    await SB.from('proposed_books').delete().eq('id', existing.id);
+  }
+  
+  await Promise.all([loadSettings(), loadProposedBooks(), loadMyVotes(), loadHistory()]);
+  renderMeetup(); renderVoteTab(); renderHistory();
+  showAlert('save-meetup-alert', '✓ Book archived to history, votes reset!', 'success');
+  setTimeout(()=>hideAlert('save-meetup-alert'), 4000);
+}
+
+// ── VOTE TAB RENDER ──
+function renderVoteTab(){
+  // Votes remaining
+  const used = myVotes.length;
+  const remaining = MAX_VOTES - used;
+  const dotsHtml = Array.from({length:MAX_VOTES}, (_,i) => 
+    `<span class="vote-dot ${i < used ? 'used' : ''}"></span>`
+  ).join('');
+  document.getElementById('vote-dots').innerHTML = dotsHtml;
+  document.getElementById('votes-left-text').textContent = `${remaining} of ${MAX_VOTES} votes remaining`;
+  
+  // Badge
+  const approved = proposedBooks.filter(b => b.status === 'approved');
+  const badge = document.getElementById('vote-badge');
+  const mobBadge = document.getElementById('mob-vote-badge');
+  if(approved.length > 0){
+    badge.textContent = approved.length; badge.style.display='inline-block';
+    mobBadge.textContent = approved.length; mobBadge.style.display='block';
+  } else {
+    badge.style.display='none'; mobBadge.style.display='none';
+  }
+  
+  // Pending (only show to the person who suggested, or admins)
+  const pending = proposedBooks.filter(b => b.status === 'pending');
+  const myPending = pending.filter(b => b.suggested_by === currentMember.id);
+  const pendSection = document.getElementById('pending-review-section');
+  
+  if(myPending.length > 0){
+    pendSection.style.display='block';
+    document.getElementById('pending-books-list').innerHTML = myPending.map(b => `
+      <div class="pending-book">
+        <div class="pend-info">
+          <div class="pend-title">${esc(b.title)}</div>
+          <div class="pend-author">${esc(b.author)}</div>
+        </div>
+        <span class="pending-badge">Awaiting approval</span>
+      </div>`).join('');
+  } else { pendSection.style.display='none' }
+  
+  // Approved books
+  const list = document.getElementById('vote-books-list');
+  if(approved.length === 0){
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📚</div><div class="empty-text">No books to vote on yet — suggest one!</div></div>';
+    return;
+  }
+  
+  // Sort by vote count desc
+  const sorted = [...approved].sort((a,b) => {
+    const av = (a.votes && a.votes[0]) ? a.votes[0].count : 0;
+    const bv = (b.votes && b.votes[0]) ? b.votes[0].count : 0;
+    return bv - av;
+  });
+  const maxVotes = sorted[0] ? ((sorted[0].votes && sorted[0].votes[0]) ? sorted[0].votes[0].count : 0) : 1;
+  
+  list.innerHTML = sorted.map(book => {
+    const voteCount = (book.votes && book.votes[0]) ? book.votes[0].count : 0;
+    const iVoted = myVotes.includes(book.id);
+    const canVote = !iVoted && remaining > 0;
+    const barW = maxVotes > 0 ? Math.round((voteCount / maxVotes) * 100) : 0;
+    
+    return `<div class="vote-book ${iVoted ? 'voted-this' : ''}">
+      <div class="vote-book-info">
+        <div class="vote-book-title">${esc(book.title)}</div>
+        <div class="vote-book-author">${esc(book.author)}</div>
+        ${book.pages ? `<div class="vote-book-status">📄 ${book.pages} pages</div>` : ''}
+        <div class="vote-bar-wrap"><div class="vote-bar" style="width:${barW}%"></div></div>
+      </div>
+      <div class="vote-actions">
+        <div>
+          <div class="vote-count">${voteCount}</div>
+          <div class="vote-count-label">vote${voteCount===1?'':'s'}</div>
+        </div>
+        ${iVoted 
+          ? `<button class="btn-vote voted" onclick="removeVote('${book.id}')">✓ Voted</button>`
+          : `<button class="btn-vote" onclick="castVote('${book.id}')" ${canVote?'':'disabled'}>${canVote?'Vote':'No votes'}</button>`
+        }
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function castVote(bookId){
+  if(myVotes.length >= MAX_VOTES) return;
+  await SB.from('votes').insert({id:uid(), book_id:bookId, member_id:currentMember.id});
+  await loadMyVotes(); await loadProposedBooks(); renderVoteTab();
+}
+async function removeVote(bookId){
+  await SB.from('votes').delete().eq('book_id', bookId).eq('member_id', currentMember.id);
+  await loadMyVotes(); await loadProposedBooks(); renderVoteTab();
+}
+
+// ── HISTORY RENDER ──
+function renderHistory(){
+  const list = document.getElementById('history-list');
+  if(historyBooks.length === 0){
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">📜</div><div class="empty-text">No history yet — your reading journey starts soon!</div></div>';
+    return;
+  }
+  list.innerHTML = historyBooks.map(b => `
+    <div class="hist-item">
+      <div class="hist-spine">📚</div>
+      <div class="hist-info">
+        <div class="hist-title">${esc(b.title)}</div>
+        <div class="hist-author">${esc(b.author||'')}</div>
+        <div class="hist-date">${b.read_date ? 'Read at meetup: '+fmtDateShort(b.read_date) : ''}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ── ADMIN RENDER ──
+function renderAdmin(){
+  if(!currentMember || currentMember.role !== 'admin') return;
+  
+  // Members
+  const list = document.getElementById('members-list');
+  if(allMembers.length === 0){
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">👤</div><div class="empty-text">No members yet</div></div>';
+  } else {
+    list.innerHTML = allMembers.map((m,i) => `
+      <div class="member-row">
+        <div class="member-avatar-lg" style="background:${m.avatar_color || AVATAR_COLORS[i%AVATAR_COLORS.length]}">${avatarInitials(m.name)}</div>
+        <div class="member-info">
+          <div class="member-name">${esc(m.name)}</div>
+          <div class="member-email">${esc(m.email)}</div>
+        </div>
+        <span class="member-role-badge ${m.role==='admin'?'role-admin':'role-user'}">${m.role}</span>
+        <div class="member-actions">
+          <button class="btn btn-outline btn-xs" onclick="openEditMember('${m.id}','${esc(m.name)}','${m.role}')">Edit</button>
+        </div>
+      </div>`).join('');
+  }
+  
+  // Pending suggestions
+  const pending = proposedBooks.filter(b => b.status === 'pending');
+  const pendBadge = document.getElementById('pending-badge');
+  if(pending.length > 0){ pendBadge.textContent=pending.length; pendBadge.style.display='inline-block' }
+  else{ pendBadge.style.display='none' }
+  
+  const pendList = document.getElementById('admin-pending-list');
+  if(pending.length === 0){
+    pendList.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-text">No pending suggestions</div></div>';
+  } else {
+    const suggestorMap = {};
+    allMembers.forEach(m => suggestorMap[m.id] = m.name);
+    pendList.innerHTML = pending.map(b => `
+      <div class="pending-book" style="margin-bottom:10px">
+        <div class="pend-info">
+          <div class="pend-title">${esc(b.title)}</div>
+          <div class="pend-author">${esc(b.author)} ${b.pages ? `· ${b.pages}p` : ''}</div>
+          <div style="font-size:11px;color:var(--ink4);margin-top:3px">Suggested by ${esc(suggestorMap[b.suggested_by]||'unknown')}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button class="btn btn-outline btn-xs" onclick="approveBook('${b.id}')">✓ Approve</button>
+          <button class="btn btn-danger btn-xs" onclick="rejectBook('${b.id}')">✕</button>
+        </div>
+      </div>`).join('');
+  }
+  
+  // Club name setting
+  document.getElementById('setting-club-name').value = settings['club_name'] || '';
+}
+
+async function approveBook(id){
+  await SB.from('proposed_books').update({status:'approved'}).eq('id', id);
+  await loadProposedBooks(); renderVoteTab(); renderAdmin();
+}
+async function rejectBook(id){
+  if(!confirm('Remove this suggestion?')) return;
+  await SB.from('proposed_books').delete().eq('id', id);
+  await loadProposedBooks(); renderVoteTab(); renderAdmin();
+}
+
+async function saveSetting(key, value){
+  await SB.from('club_settings').upsert({key, value});
+  await loadSettings();
+}
+
+// ── INVITE ──
+async function sendInvite(){
+  const name = document.getElementById('invite-name').value.trim();
+  const email = document.getElementById('invite-email').value.trim().toLowerCase();
+  const role = document.getElementById('invite-role').value;
+  
+  hideAlert('invite-error'); hideAlert('invite-success');
+  if(!name || !email){ showAlert('invite-error','Please fill in name and email'); return; }
+  
+  // Check if already a member
+  const existing = allMembers.find(m => m.email === email);
+  if(existing){ showAlert('invite-error','This email is already a member'); return; }
+  
+  // Create a member record (they'll claim it when they sign in)
+  const color = AVATAR_COLORS[allMembers.length % AVATAR_COLORS.length];
+  const { data: authData, error: authErr } = await SB.auth.admin ? 
+    { data: null, error: null } : { data: null, error: null };
+  
+  // Insert member record with a placeholder UUID — will be linked when they sign in via magic link
+  // We'll use a generated ID; on first login we match by email
+  const tempId = crypto.randomUUID ? crypto.randomUUID() : uid();
+  const { error } = await SB.from('members').insert({
+    id: tempId, email, name, role, avatar_color: color
+  });
+  
+  if(error){ showAlert('invite-error', 'Error: '+error.message); return; }
+  
+  // Send magic link via Supabase Auth (invite flow)
+  const cfg = getConfig();
+  const redirectUrl = window.location.href.split('#')[0];
+  
+  const { error: invErr } = await SB.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo: redirectUrl,
+      data: { invited_by: currentMember.name }
+    }
+  });
+  
+  if(invErr){ 
+    showAlert('invite-success', `✓ Member added! (Email invite failed: ${invErr.message} — they can sign in manually)`, 'info');
+  } else {
+    showAlert('invite-success', `✓ Invite sent to ${email}! They'll receive a sign-in link.`, 'success');
+  }
+  
+  document.getElementById('invite-name').value='';
+  document.getElementById('invite-email').value='';
+  await loadMembers(); renderAdmin();
+}
+
+// ── EDIT MEMBER ──
+function openEditMember(id, name, role){
+  document.getElementById('edit-member-id').value = id;
+  document.getElementById('edit-member-name').value = name;
+  document.getElementById('edit-member-role').value = role;
+  hideAlert('edit-member-error');
+  openModal('edit-member-modal');
+}
+async function saveMemberEdit(){
+  const id = document.getElementById('edit-member-id').value;
+  const name = document.getElementById('edit-member-name').value.trim();
+  const role = document.getElementById('edit-member-role').value;
+  if(!name){ showAlert('edit-member-error','Name is required'); return; }
+  await SB.from('members').update({name, role}).eq('id', id);
+  closeModal('edit-member-modal');
+  await loadMembers(); renderAdmin();
+}
+async function removeMember(){
+  const id = document.getElementById('edit-member-id').value;
+  if(!confirm('Remove this member from the club?')) return;
+  await SB.from('members').delete().eq('id', id);
+  closeModal('edit-member-modal');
+  await loadMembers(); renderAdmin();
+}
+
+// ── SUGGEST BOOK ──
+function openSuggestModal(){
+  document.getElementById('suggest-title').value='';
+  document.getElementById('suggest-author').value='';
+  document.getElementById('suggest-pages').value='';
+  document.getElementById('book-search-input').value='';
+  document.getElementById('book-search-results').className='search-results';
+  hideAlert('suggest-error');
+  openModal('suggest-modal');
+}
+async function submitSuggestion(){
+  const title = document.getElementById('suggest-title').value.trim();
+  const author = document.getElementById('suggest-author').value.trim();
+  const pages = parseInt(document.getElementById('suggest-pages').value)||null;
+  hideAlert('suggest-error');
+  if(!title){ showAlert('suggest-error','Please enter a book title'); return; }
+  
+  // Check for duplicate
+  const dup = proposedBooks.find(b => b.title.toLowerCase() === title.toLowerCase());
+  if(dup){ showAlert('suggest-error','This book has already been suggested'); return; }
+  
+  await SB.from('proposed_books').insert({
+    id: uid(), title, author: author||'', pages,
+    status: 'pending', suggested_by: currentMember.id
+  });
+  
+  closeModal('suggest-modal');
+  await loadProposedBooks(); renderVoteTab();
+}
+
+// ── BOOK SEARCH ──
+function searchBooks(){
+  const q = document.getElementById('book-search-input').value.toLowerCase().trim();
+  const res = document.getElementById('book-search-results');
+  if(q.length < 2){ res.className='search-results'; return; }
+  
+  const matches = BOOK_LIBRARY.filter(b => 
+    b.title.toLowerCase().includes(q) || b.author.toLowerCase().includes(q)
+  ).slice(0, 8);
+  
+  if(matches.length === 0){ res.className='search-results'; return; }
+  
+  res.innerHTML = matches.map(b => `
+    <div class="search-result" onclick="selectBook(${JSON.stringify(b.title)}, ${JSON.stringify(b.author)}, ${b.pages})">
+      <div class="search-result-title">${esc(b.title)}</div>
+      <div class="search-result-author">${esc(b.author)} ${b.pages ? `· ${b.pages}p` : ''}</div>
+    </div>`).join('');
+  res.className = 'search-results open';
+}
+
+function selectBook(title, author, pages){
+  document.getElementById('suggest-title').value = title;
+  document.getElementById('suggest-author').value = author;
+  document.getElementById('suggest-pages').value = pages||'';
+  document.getElementById('book-search-input').value = title + ' — ' + author;
+  document.getElementById('book-search-results').className='search-results';
+}
+
+// Close search results on outside click
+document.addEventListener('click', e => {
+  if(!e.target.closest('.search-wrap')){
+    const r = document.getElementById('book-search-results');
+    if(r) r.className='search-results';
+  }
+});
+
+// ── MODAL HELPERS ──
+function openModal(id){ document.getElementById(id).classList.remove('hidden') }
+function closeModal(id){ document.getElementById(id).classList.add('hidden') }
+function openInviteModal(){
+  document.getElementById('invite-name').value='';
+  document.getElementById('invite-email').value='';
+  document.getElementById('invite-role').value='user';
+  hideAlert('invite-error'); hideAlert('invite-success');
+  openModal('invite-modal');
+}
+
+// ── SETUP / LOGIN ──
+async function saveSetup(){
+  const url = document.getElementById('setup-url').value.trim();
+  const key = document.getElementById('setup-key').value.trim();
+  const err = document.getElementById('setup-error');
+  err.style.display='none';
+  
+  if(!url || !key){ err.textContent='Please fill in both fields.'; err.style.display='block'; return; }
+  
+  try{
+    const client = window.supabase.createClient(url, key);
+    const { error } = await client.from('club_settings').select('key').limit(1);
+    if(error) throw error;
+    saveConfig(url, key);
+    SB = client;
+    document.getElementById('setup-screen').style.display='none';
+    document.getElementById('loading-overlay').style.display='flex';
+    
+    const { data: { session } } = await SB.auth.getSession();
+    if(session){
+      currentUser = session.user;
+      await loadMemberProfile();
+      if(currentMember) await bootApp();
+      else { document.getElementById('loading-overlay').style.display='none'; document.getElementById('login-screen').style.display='flex'; }
+    } else {
+      document.getElementById('loading-overlay').style.display='none';
+      document.getElementById('login-screen').style.display='flex';
+    }
+    
+    SB.auth.onAuthStateChange(async (event, session) => {
+      if(event==='SIGNED_IN' && session && !currentUser){
+        currentUser = session.user;
+        document.getElementById('login-screen').style.display='none';
+        document.getElementById('loading-overlay').style.display='flex';
+        await loadMemberProfile();
+        if(currentMember) await bootApp();
+        else { document.getElementById('loading-overlay').style.display='none'; showNoMemberMessage(); }
+      }
+    });
+    
+  } catch(e){
+    err.textContent = 'Could not connect: '+e.message+'. Check your URL and key.';
+    err.style.display='block';
+  }
+}
+
+async function doLogin(){
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const err = document.getElementById('login-error');
+  const success = document.getElementById('login-success');
+  const btn = document.getElementById('login-btn');
+  err.style.display='none'; success.style.display='none';
+  
+  if(!email || !email.includes('@')){ err.textContent='Please enter a valid email.'; err.style.display='block'; return; }
+  
+  btn.innerHTML = '<span class="spinner"></span> Sending…';
+  btn.disabled = true;
+  
+  const redirectUrl = window.location.href.split('#')[0];
+  const { error } = await SB.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: redirectUrl }
+  });
+  
+  btn.innerHTML = 'Send magic link →';
+  btn.disabled = false;
+  
+  if(error){ err.textContent=error.message; err.style.display='block'; return; }
+  success.style.display='block';
+}
+
+function disconnectSupabase(){
+  if(!confirm('Disconnect Supabase? You will need to set it up again.')) return;
+  clearConfig();
+  location.reload();
+}
+
+// ── FIRST-LOGIN MEMBER SYNC ──
+// When a user signs in via magic link, if their auth user ID doesn't match 
+// the member record, update it (handles invited members)
+async function syncMemberOnLogin(){
+  if(!currentUser) return;
+  // Check if there's a member record by email that has a different ID
+  const { data } = await SB.from('members').select('*').eq('email', currentUser.email).single();
+  if(data && data.id !== currentUser.id){
+    // Update the member record ID to match the auth user ID
+    await SB.from('members').update({id: currentUser.id}).eq('email', currentUser.email);
+    const { data: updated } = await SB.from('members').select('*').eq('id', currentUser.id).single();
+    currentMember = updated;
+  } else {
+    currentMember = data;
+  }
+}
+
+// Override loadMemberProfile to handle the sync
+const _origLoadMemberProfile = loadMemberProfile;
+async function loadMemberProfile(){
+  const { data: direct } = await SB.from('members').select('*').eq('id', currentUser.id).single();
+  if(direct){ currentMember = direct; return; }
+  // Try by email (invited member with temp ID)
+  const { data: byEmail } = await SB.from('members').select('*').eq('email', currentUser.email).single();
+  if(byEmail){
+    // Update to real auth ID
+    try{
+      await SB.from('members').update({id: currentUser.id}).eq('email', currentUser.email);
+    } catch(e){
+      // If conflict, just use the existing record
+    }
+    const { data: updated } = await SB.from('members').select('*').eq('id', currentUser.id).single();
+    currentMember = updated || byEmail;
+  } else {
+    currentMember = null;
+  }
+}
+
+// ── ESCAPE ──
+function esc(s){ 
+  if(!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── BOOT ──
+window.addEventListener('DOMContentLoaded', initApp);
+</script>
+
+<!-- Supabase CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+</body>
+</html>
