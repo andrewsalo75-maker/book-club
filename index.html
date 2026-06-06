@@ -382,11 +382,12 @@ html,body{height:100%;background:var(--cream);color:var(--ink);font-family:'Crim
       </a>
     </nav>
     <div class="sidebar-bottom">
-      <div class="user-pill" onclick="showTab('profile')">
+      <div class="user-pill" onclick="openChangePasswordModal()" title="Change password">
         <div class="user-avatar" id="sidebar-avatar">?</div>
         <div class="user-info">
           <div class="user-name" id="sidebar-name">Loading…</div>
           <div class="user-role" id="sidebar-role">member</div>
+          <div class="user-role" style="font-size:10px;opacity:.5">🔑 change password</div>
         </div>
       </div>
     </div>
@@ -705,7 +706,7 @@ html,body{height:100%;background:var(--cream);color:var(--ink);font-family:'Crim
       <button class="modal-close" onclick="closeModal('invite-modal')">✕</button>
     </div>
     <div class="modal-body">
-      <div class="alert alert-info">Add the member here, then share their temporary password with them. They can change it after signing in.</div>
+      <div class="alert alert-info">They'll receive an email with a link to set their own password and join the club.</div>
       <div class="field">
         <label class="label">Name</label>
         <input class="input" id="invite-name" type="text" placeholder="First name">
@@ -713,14 +714,6 @@ html,body{height:100%;background:var(--cream);color:var(--ink);font-family:'Crim
       <div class="field">
         <label class="label">Email</label>
         <input class="input" id="invite-email" type="email" placeholder="email@example.com">
-      </div>
-      <div class="field">
-        <label class="label">Temporary Password</label>
-        <div style="display:flex;gap:8px">
-          <input class="input" id="invite-password" type="text" placeholder="e.g. BookClub2025" style="flex:1">
-          <button class="btn btn-outline btn-sm" onclick="generateTempPassword()" style="flex-shrink:0">Generate</button>
-        </div>
-        <div style="font-size:12px;color:var(--ink3);margin-top:4px">Share this with the member so they can log in</div>
       </div>
       <div class="field">
         <label class="label">Role</label>
@@ -734,7 +727,7 @@ html,body{height:100%;background:var(--cream);color:var(--ink);font-family:'Crim
     </div>
     <div class="modal-foot">
       <button class="btn btn-outline" onclick="closeModal('invite-modal')">Cancel</button>
-      <button class="btn btn-amber" onclick="sendInvite()">Add Member</button>
+      <button class="btn btn-amber" id="invite-btn" onclick="sendInvite()">Send Invite</button>
     </div>
   </div>
 </div>
@@ -765,6 +758,32 @@ html,body{height:100%;background:var(--cream);color:var(--ink);font-family:'Crim
       <button class="btn btn-danger btn-sm" onclick="removeMember()">Remove Member</button>
       <button class="btn btn-outline ml-auto" onclick="closeModal('edit-member-modal')">Cancel</button>
       <button class="btn btn-amber" onclick="saveMemberEdit()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="overlay hidden" id="change-password-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">🔑 Change Password</div>
+      <button class="modal-close" onclick="closeModal('change-password-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label class="label">New Password</label>
+        <input class="input" id="change-password-input" type="password" placeholder="At least 6 characters">
+      </div>
+      <div class="field">
+        <label class="label">Confirm New Password</label>
+        <input class="input" id="change-password-confirm" type="password" placeholder="Repeat password" onkeydown="if(event.key==='Enter')doChangePassword()">
+      </div>
+      <div id="change-password-error" class="alert alert-error" style="display:none"></div>
+      <div id="change-password-success" class="alert alert-success" style="display:none"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('change-password-modal')">Cancel</button>
+      <button class="btn btn-amber" id="change-password-btn" onclick="doChangePassword()">Update Password</button>
     </div>
   </div>
 </div>
@@ -1070,12 +1089,50 @@ async function initApp(){
   await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js');
 
   try{
-    SB = window.supabase.createClient(SB_URL, SB_KEY);
+    SB = window.supabase.createClient(SB_URL, SB_KEY, {
+      auth: { detectSessionInUrl: true, persistSession: true }
+    });
 
-    // Handle password recovery redirect
+    // Register auth listener FIRST before anything else
+    SB.auth.onAuthStateChange(async (event, session) => {
+      if(event === 'PASSWORD_RECOVERY'){
+        currentUser = session.user;
+        document.getElementById('loading-overlay').style.display='none';
+        document.getElementById('login-screen').style.display='none';
+        document.getElementById('app-shell').style.display='none';
+        document.getElementById('set-password-screen').style.display='flex';
+      } else if(event === 'SIGNED_IN' && session && !currentUser){
+        currentUser = session.user;
+        document.getElementById('login-screen').style.display='none';
+        document.getElementById('loading-overlay').style.display='flex';
+        await loadMemberProfile();
+        if(currentMember){
+          await bootApp();
+        } else {
+          document.getElementById('loading-overlay').style.display='none';
+          showNoMemberMessage();
+        }
+      }
+    });
+
+    // Check for recovery token in URL hash directly
     const hash = window.location.hash;
     if(hash && hash.includes('type=recovery')){
-      // Let onAuthStateChange handle it
+      // Parse the token and let Supabase exchange it
+      const params = new URLSearchParams(hash.replace('#',''));
+      const accessToken = params.get('access_token');
+      const refreshToken = params.get('refresh_token');
+      if(accessToken){
+        const { data, error } = await SB.auth.setSession({ access_token: accessToken, refresh_token: refreshToken || '' });
+        if(!error && data.session){
+          currentUser = data.session.user;
+          document.getElementById('loading-overlay').style.display='none';
+          document.getElementById('set-password-screen').style.display='flex';
+          // Clean the URL
+          window.history.replaceState(null, '', window.location.pathname);
+          return;
+        }
+      }
     }
 
     const { data: { session } } = await SB.auth.getSession();
@@ -1099,27 +1156,6 @@ async function initApp(){
     document.getElementById('loading-overlay').style.display='none';
     document.getElementById('login-screen').style.display='flex';
   }
-
-  // Auth state listener
-  SB.auth.onAuthStateChange(async (event, session) => {
-    if(event === 'PASSWORD_RECOVERY'){
-      currentUser = session.user;
-      document.getElementById('login-screen').style.display='none';
-      document.getElementById('loading-overlay').style.display='none';
-      document.getElementById('set-password-screen').style.display='flex';
-    } else if(event === 'SIGNED_IN' && session && !currentUser){
-      currentUser = session.user;
-      document.getElementById('login-screen').style.display='none';
-      document.getElementById('loading-overlay').style.display='flex';
-      await loadMemberProfile();
-      if(currentMember){
-        await bootApp();
-      } else {
-        document.getElementById('loading-overlay').style.display='none';
-        showNoMemberMessage();
-      }
-    }
-  });
 }
 
 function showNoMemberMessage(){
@@ -1697,64 +1733,93 @@ async function saveSetting(key, value){
 async function sendInvite(){
   const name = document.getElementById('invite-name').value.trim();
   const email = document.getElementById('invite-email').value.trim().toLowerCase();
-  const password = document.getElementById('invite-password').value.trim();
   const role = document.getElementById('invite-role').value;
+  const btn = document.getElementById('invite-btn');
 
   hideAlert('invite-error'); hideAlert('invite-success');
   if(!name || !email){ showAlert('invite-error','Please fill in name and email'); return; }
-  if(!password || password.length < 6){ showAlert('invite-error','Temporary password must be at least 6 characters'); return; }
 
-  // Check if already a member
   const existing = allMembers.find(m => m.email === email);
   if(existing){ showAlert('invite-error','This email is already a member'); return; }
 
-  // Create Supabase auth user with password
-  // We use signUp — this creates the auth user
-  // We need to use a secondary client so we don't log out the current admin
-  const tempClient = window.supabase.createClient(SB_URL, SB_KEY);
-  const { data: signUpData, error: signUpErr } = await tempClient.auth.signUp({ email, password });
+  btn.innerHTML = '<span class="spinner"></span> Sending…';
+  btn.disabled = true;
 
-  if(signUpErr){ showAlert('invite-error','Could not create account: '+signUpErr.message); return; }
-
-  const newUserId = signUpData.user ? signUpData.user.id : null;
-  if(!newUserId){ showAlert('invite-error','Account creation failed — no user ID returned.'); return; }
-
-  // Sign the temp client back out so it doesn't interfere
-  await tempClient.auth.signOut();
-
-  // Insert member record
+  // Pre-create member record matched by email on first login
   const color = AVATAR_COLORS[allMembers.length % AVATAR_COLORS.length];
+  const tempId = crypto.randomUUID ? crypto.randomUUID() : uid();
   const { error: memberErr } = await SB.from('members').insert({
-    id: newUserId, email, name, role, avatar_color: color
+    id: tempId, email, name, role, avatar_color: color
   });
 
-  if(memberErr){ showAlert('invite-error','Account created but member record failed: '+memberErr.message); return; }
+  if(memberErr){
+    btn.innerHTML = 'Send Invite'; btn.disabled = false;
+    showAlert('invite-error','Could not create member record: '+memberErr.message);
+    return;
+  }
 
-  showAlert('invite-success',
-    `✓ ${name} added! Share these login details with them:\n📧 Email: ${email}\n🔑 Password: ${password}`,
-    'success');
+  // Send invite email — recipient clicks link and sets their own password
+  const { error: invErr } = await SB.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo: 'https://andrewsalo75-maker.github.io/book-club',
+      shouldCreateUser: true
+    }
+  });
+
+  btn.innerHTML = 'Send Invite'; btn.disabled = false;
+
+  if(invErr){
+    showAlert('invite-error', 'Member added but invite email failed: '+invErr.message+'. They can use "Forgot password" to set their password.');
+  } else {
+    showAlert('invite-success', `✓ Invite sent to ${email}! They\'ll receive an email to set their password and join.`, 'success');
+  }
 
   document.getElementById('invite-name').value='';
   document.getElementById('invite-email').value='';
-  document.getElementById('invite-password').value='';
   await loadMembers(); renderAdmin();
-}
-
-function generateTempPassword(){
-  const words = ['Book','Club','Read','Page','Story','Novel','Chapter'];
-  const word = words[Math.floor(Math.random()*words.length)];
-  const num = Math.floor(1000 + Math.random()*9000);
-  document.getElementById('invite-password').value = word + num;
 }
 
 function openInviteModal(){
   document.getElementById('invite-name').value='';
   document.getElementById('invite-email').value='';
-  document.getElementById('invite-password').value='';
   document.getElementById('invite-role').value='user';
-  generateTempPassword();
   hideAlert('invite-error'); hideAlert('invite-success');
   openModal('invite-modal');
+}
+
+// ── CHANGE PASSWORD ──
+function openChangePasswordModal(){
+  document.getElementById('change-password-input').value='';
+  document.getElementById('change-password-confirm').value='';
+  hideAlert('change-password-error');
+  hideAlert('change-password-success');
+  openModal('change-password-modal');
+}
+
+async function doChangePassword(){
+  const password = document.getElementById('change-password-input').value;
+  const confirm = document.getElementById('change-password-confirm').value;
+  const btn = document.getElementById('change-password-btn');
+  hideAlert('change-password-error'); hideAlert('change-password-success');
+
+  if(password.length < 6){ showAlert('change-password-error','Password must be at least 6 characters.'); return; }
+  if(password !== confirm){ showAlert('change-password-error','Passwords do not match.'); return; }
+
+  btn.innerHTML = '<span class="spinner"></span> Saving…';
+  btn.disabled = true;
+
+  const { error } = await SB.auth.updateUser({ password });
+
+  btn.innerHTML = 'Update Password';
+  btn.disabled = false;
+
+  if(error){ showAlert('change-password-error', error.message); return; }
+
+  showAlert('change-password-success', '✓ Password updated successfully!', 'success');
+  document.getElementById('change-password-input').value='';
+  document.getElementById('change-password-confirm').value='';
+  setTimeout(() => closeModal('change-password-modal'), 2000);
 }
 
 // ── EDIT MEMBER ──
