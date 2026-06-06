@@ -1720,7 +1720,7 @@ function renderLibrary(q=''){
     const authorSafe = b.author.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 
     const coverHtml = coverUrl
-      ? '<img src="' + coverUrl + '" alt="' + esc(b.title) + '" style="width:62px;height:90px;object-fit:cover;border-radius:4px;box-shadow:2px 2px 6px rgba(0,0,0,.2);display:block" onerror="this.style.display='none'">'
+      ? '<img src="' + coverUrl + '" alt="cover" style="width:62px;height:90px;object-fit:cover;border-radius:4px;box-shadow:2px 2px 6px rgba(0,0,0,.2);display:block">'
       : '<div class="book-card-cover-placeholder" style="background:' + spineColor + '" data-lib-id="' + libId + '">📖</div>';
 
     return '<div class="book-card ' + (iVoted?'voted-lib':'') + '" id="card-' + libId + '">'
