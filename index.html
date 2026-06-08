@@ -23,268 +23,186 @@ a,button,input,select,[onclick]{touch-action:manipulation;-webkit-tap-highlight-
   --amber:#c47c2b;--amber-light:#f5e4c8;--amber-pale:#fdf6eb;
   --rose:#8b3a4a;--rose-light:#f2dfe3;
   --surface:#ffffff;
-  --radius:10px;--radius-sm:6px;
-  --shadow:0 2px 8px rgba(26,16,9,.08),0 1px 2px rgba(26,16,9,.04);
-  --shadow-md:0 4px 16px rgba(26,16,9,.12),0 2px 4px rgba(26,16,9,.06);
+  --radius:12px;--radius-sm:8px;
+  --shadow:0 1px 4px rgba(26,16,9,.06);--shadow-md:0 4px 16px rgba(26,16,9,.12);
 }
 html,body{height:100%;background:var(--cream);color:var(--ink);font-family:'Crimson Pro',Georgia,serif;font-size:16px;line-height:1.6}
-
-/* ── SHELL ── */
 .shell{display:flex;height:100vh;overflow:hidden}
-.sidebar{width:220px;flex-shrink:0;background:var(--ink);display:flex;flex-direction:column;border-right:1px solid rgba(255,255,255,.06)}
+.sidebar{width:220px;flex-shrink:0;background:var(--ink);display:flex;flex-direction:column}
 .main{flex:1;overflow-y:auto;background:var(--cream)}
-
-/* ── SIDEBAR ── */
-.brand{padding:28px 20px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
-.brand-icon{font-size:28px;margin-bottom:8px;display:block}
-.brand-name{font-family:'Playfair Display',Georgia,serif;font-size:20px;font-weight:400;color:#fff;letter-spacing:.2px;line-height:1.2}
-.brand-sub{font-size:12px;color:rgba(255,255,255,.4);margin-top:4px;font-style:italic}
-
-.nav{flex:1;padding:12px 0;overflow-y:auto}
-.nav-item{display:flex;align-items:center;gap:10px;padding:11px 20px;cursor:pointer;color:rgba(255,255,255,.55);font-size:14px;font-family:'Crimson Pro',serif;font-weight:400;letter-spacing:.1px;transition:all .15s;border-left:2px solid transparent;text-decoration:none;position:relative}
-.nav-item:hover{color:rgba(255,255,255,.85);background:rgba(255,255,255,.04)}
-.nav-item.active{color:#fff;background:rgba(255,255,255,.07);border-left-color:var(--amber)}
-.nav-item .nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
-.nav-item .nav-badge{margin-left:auto;background:var(--amber);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;font-family:'Crimson Pro',serif}
-
-.sidebar-bottom{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08)}
-.user-pill{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border-radius:var(--radius-sm);padding:10px 12px;cursor:pointer;transition:background .15s}
+.brand{padding:22px 18px 16px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand-icon{font-size:24px;margin-bottom:5px;display:block}
+.brand-name{font-family:'Playfair Display',Georgia,serif;font-size:18px;font-weight:400;color:#fff;line-height:1.2}
+.brand-sub{font-size:11px;color:rgba(255,255,255,.3);margin-top:2px;font-style:italic}
+.nav{flex:1;padding:8px 0;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:12px 18px;cursor:pointer;color:rgba(255,255,255,.5);font-size:14px;font-family:'Crimson Pro',serif;transition:all .15s;border-left:2px solid transparent;text-decoration:none}
+.nav-item:hover{color:rgba(255,255,255,.85);background:rgba(255,255,255,.05)}
+.nav-item.active{color:#fff;background:rgba(255,255,255,.08);border-left-color:var(--amber)}
+.nav-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--amber);color:#fff;font-size:10px;padding:2px 7px;border-radius:10px}
+.sidebar-bottom{padding:14px 18px;border-top:1px solid rgba(255,255,255,.08)}
+.user-pill{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.06);border-radius:8px;padding:10px 12px;cursor:pointer;transition:background .15s}
 .user-pill:hover{background:rgba(255,255,255,.1)}
-.user-avatar{width:30px;height:30px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;font-weight:600;flex-shrink:0}
+.user-avatar{width:34px;height:34px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-weight:600;flex-shrink:0}
 .user-info{flex:1;min-width:0}
-.user-name{font-size:13px;color:rgba(255,255,255,.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-name{font-size:13px;color:rgba(255,255,255,.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
 .user-role{font-size:11px;color:rgba(255,255,255,.35);font-style:italic}
-
-/* ── MOBILE NAV ── */
-.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--ink);border-top:1px solid rgba(255,255,255,.08);z-index:100;padding-bottom:env(safe-area-inset-bottom)}
-.mobile-nav-inner{display:flex;justify-content:space-around;align-items:center;height:56px}
-.mob-nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 12px;cursor:pointer;color:rgba(255,255,255,.45);font-size:10px;font-family:'Crimson Pro',serif;border:none;background:none;transition:color .15s;position:relative}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--ink);border-top:1px solid rgba(255,255,255,.1);z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+.mobile-nav-inner{display:flex;justify-content:space-around;align-items:center;height:60px}
+.mob-nav-btn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 8px;cursor:pointer;color:rgba(255,255,255,.4);font-size:10px;font-family:'Crimson Pro',serif;border:none;background:none;transition:color .15s;position:relative;min-width:50px}
 .mob-nav-btn.active{color:var(--amber)}
-.mob-nav-btn .mob-icon{font-size:18px}
-.mob-badge{position:absolute;top:4px;right:8px;background:var(--amber);color:#fff;font-size:9px;padding:1px 4px;border-radius:8px;min-width:14px;text-align:center}
-
-/* ── PAGE STRUCTURE ── */
-.page{display:none;min-height:100%;padding-bottom:20px}
+.mob-icon{font-size:20px;line-height:1.2}
+.mob-badge{position:absolute;top:3px;right:4px;background:var(--amber);color:#fff;font-size:9px;padding:1px 4px;border-radius:8px;min-width:14px;text-align:center}
+.page{display:none;min-height:100%;padding-bottom:24px}
 .page.active{display:block}
-.page-header{padding:28px 32px 20px;border-bottom:1px solid var(--border2);background:var(--paper);position:sticky;top:0;z-index:10}
-.page-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:400;color:var(--ink);line-height:1.2}
-.page-sub{font-size:14px;color:var(--ink3);margin-top:3px;font-style:italic}
-.page-body{padding:24px 32px}
-
-/* ── CARDS ── */
-.card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden}
-.card-head{padding:16px 20px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:10px}
-.card-icon{font-size:20px}
-.card-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:400}
-.card-body{padding:20px}
-.card-badge{margin-left:auto;background:var(--amber-light);color:var(--amber);font-size:12px;padding:3px 10px;border-radius:12px;font-weight:500}
-
-/* ── MEETUP DISPLAY ── */
-.meetup-hero{background:linear-gradient(135deg,var(--forest) 0%,#1d3226 100%);border-radius:var(--radius);padding:28px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden}
-.meetup-hero::before{content:'📚';position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:80px;opacity:.1}
-.meetup-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;font-family:'Crimson Pro',serif}
-.meetup-date{font-family:'Playfair Display',serif;font-size:32px;font-weight:400;line-height:1.2;margin-bottom:4px}
-.meetup-date-sub{font-size:14px;color:rgba(255,255,255,.6);font-style:italic}
-.meetup-countdown{font-size:13px;color:rgba(255,255,255,.5);margin-top:10px;display:flex;align-items:center;gap:6px}
-
-.book-hero{background:var(--paper);border:2px solid var(--border2);border-radius:var(--radius);padding:24px;display:flex;gap:20px;align-items:flex-start}
-.book-spine{width:52px;height:72px;border-radius:4px;background:linear-gradient(135deg,var(--amber) 0%,#8b5a1a 100%);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;box-shadow:3px 3px 8px rgba(0,0,0,.2)}
-.book-info{flex:1}
-.book-info-label{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px}
-.book-info-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--ink);line-height:1.3}
-.book-info-author{font-size:15px;color:var(--ink2);margin-top:3px;font-style:italic}
-.book-info-pages{font-size:13px;color:var(--ink3);margin-top:6px}
-
-/* ── VOTING ── */
-.vote-book{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:16px 18px;display:flex;gap:14px;align-items:flex-start;margin-bottom:10px;transition:border-color .2s,box-shadow .2s;cursor:default}
-.vote-book:hover{border-color:var(--border);box-shadow:var(--shadow)}
-.vote-book.voted-this{border-color:var(--amber);background:var(--amber-pale)}
-.vote-book-info{flex:1;min-width:0}
-.vote-book-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:400;line-height:1.3;color:var(--ink)}
-.vote-book-author{font-size:13px;color:var(--ink3);margin-top:2px;font-style:italic}
-.vote-book-status{font-size:11px;color:var(--ink4);margin-top:4px}
-.vote-bar-wrap{margin-top:8px;background:var(--warm);border-radius:4px;height:6px;overflow:hidden}
-.vote-bar{height:100%;background:var(--amber);border-radius:4px;transition:width .4s ease}
-.vote-actions{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
-.vote-count{font-family:'Playfair Display',serif;font-size:20px;font-weight:400;color:var(--ink2);text-align:center;min-width:30px}
-.vote-count-label{font-size:10px;color:var(--ink4);text-align:center;margin-top:-4px}
-.btn-vote{border:2px solid var(--amber);background:none;color:var(--amber);border-radius:var(--radius-sm);padding:6px 14px;font-family:'Crimson Pro',serif;font-size:13px;cursor:pointer;transition:all .15s;white-space:nowrap}
-.btn-vote:hover{background:var(--amber);color:#fff}
-.btn-vote.voted{background:var(--amber);color:#fff}
-.btn-vote:disabled{opacity:.4;cursor:not-allowed}
-.vote-chip{display:inline-flex;align-items:center;gap:6px;background:var(--forest-pale);color:var(--forest);font-size:13px;border-radius:20px;padding:6px 14px}
-
-/* ── PENDING BOOKS ── */
-.pending-book{background:var(--surface);border:1px dashed var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;gap:12px;align-items:center;margin-bottom:8px}
-.pending-book .pend-info{flex:1}
-.pending-book .pend-title{font-size:14px;font-weight:500;color:var(--ink)}
-.pending-book .pend-author{font-size:13px;color:var(--ink3);font-style:italic}
-.pending-badge{font-size:11px;background:var(--amber-light);color:var(--amber);padding:2px 8px;border-radius:10px;flex-shrink:0}
-
-/* ── HISTORY ── */
-.hist-item{display:flex;gap:14px;align-items:flex-start;padding:16px 0;border-bottom:1px solid var(--border2)}
-.hist-item:last-child{border-bottom:none}
-.hist-spine{width:36px;height:50px;border-radius:3px;background:linear-gradient(135deg,var(--ink3) 0%,var(--ink2) 100%);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;opacity:.8}
-.hist-info{flex:1}
-.hist-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--ink)}
-.hist-author{font-size:13px;color:var(--ink3);font-style:italic;margin-top:1px}
-.hist-date{font-size:12px;color:var(--ink4);margin-top:3px}
-
-/* ── ADMIN ── */
-.member-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border2)}
-.member-row:last-child{border-bottom:none}
-.member-avatar-lg{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#fff;flex-shrink:0}
-.member-info{flex:1;min-width:0}
-.member-name{font-size:15px;color:var(--ink);font-weight:500}
-.member-email{font-size:12px;color:var(--ink3)}
-.member-role-badge{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500;flex-shrink:0}
-.role-admin{background:var(--rose-light);color:var(--rose)}
-.role-user{background:var(--forest-pale);color:var(--forest)}
-.member-actions{display:flex;gap:6px;flex-shrink:0}
-
-/* ── BUTTONS ── */
-.btn{border:none;border-radius:var(--radius-sm);padding:9px 18px;font-family:'Crimson Pro',serif;font-size:14px;cursor:pointer;transition:all .15s;font-weight:500}
-.btn-primary{background:var(--ink);color:#fff}
-.btn-primary:hover{background:var(--ink2)}
-.btn-amber{background:var(--amber);color:#fff}
-.btn-amber:hover{background:#a86920}
-.btn-outline{background:none;border:1px solid var(--border);color:var(--ink2)}
-.btn-outline:hover{border-color:var(--ink3);background:var(--warm)}
-.btn-danger{background:var(--rose-light);color:var(--rose);border:none}
-.btn-danger:hover{background:var(--rose);color:#fff}
-.btn-sm{padding:6px 12px;font-size:13px}
-.btn-xs{padding:4px 9px;font-size:12px}
-
-/* ── FORM ELEMENTS ── */
-.field{margin-bottom:14px}
-.label{display:block;font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
-.input{width:100%;padding:10px 13px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Crimson Pro',serif;font-size:15px;background:var(--surface);color:var(--ink);outline:none;transition:border-color .15s}
-.input:focus{border-color:var(--amber)}
-.select{width:100%;padding:10px 13px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Crimson Pro',serif;font-size:15px;background:var(--surface);color:var(--ink);outline:none;cursor:pointer}
-.select:focus{border-color:var(--amber)}
-
-/* ── MODALS ── */
-.overlay{position:fixed;inset:0;background:rgba(26,16,9,.6);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)}
-.overlay.hidden{display:none}
-.modal{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-md);width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
-.modal-head{padding:20px 24px 16px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between}
-.modal-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:400}
-.modal-close{background:none;border:none;font-size:20px;color:var(--ink3);cursor:pointer;padding:4px 8px;border-radius:4px;line-height:1}
-.modal-close:hover{background:var(--warm);color:var(--ink)}
-.modal-body{padding:20px 24px}
-.modal-foot{padding:16px 24px;border-top:1px solid var(--border2);display:flex;gap:10px;justify-content:flex-end}
-
-/* ── LOGIN ── */
-.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--ink);padding:20px}
-.login-card{background:var(--paper);border-radius:16px;padding:40px 36px;width:100%;max-width:400px;text-align:center}
-.login-logo{font-size:48px;margin-bottom:16px}
-.login-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:400;color:var(--ink);margin-bottom:6px}
-.login-sub{font-size:15px;color:var(--ink3);font-style:italic;margin-bottom:28px}
-.login-form{text-align:left}
-.login-hint{font-size:13px;color:var(--ink3);text-align:center;margin-top:12px;font-style:italic}
-.login-success{background:var(--forest-pale);border:1px solid var(--forest-light);border-radius:var(--radius-sm);padding:16px;color:var(--forest);font-size:14px;margin-top:16px;text-align:center;display:none}
-
-/* ── SETUP SCREEN ── */
-.setup-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--ink);padding:20px}
-.setup-card{background:var(--paper);border-radius:16px;padding:36px;width:100%;max-width:560px}
-.setup-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:400;margin-bottom:6px}
-.setup-sub{font-size:14px;color:var(--ink3);font-style:italic;margin-bottom:24px}
-.code-block{background:var(--ink);border-radius:var(--radius-sm);padding:16px;font-family:'Courier New',monospace;font-size:11px;color:#74C69D;line-height:1.8;white-space:pre-wrap;word-break:break-all;margin-bottom:16px;overflow-x:auto}
-.steps-list{margin:0 0 20px 20px;font-size:14px;color:var(--ink2);line-height:2}
-.steps-list li{margin-bottom:4px}
-
-/* ── ALERTS ── */
-.alert{padding:12px 16px;border-radius:var(--radius-sm);font-size:14px;margin-bottom:14px}
-.alert-info{background:var(--amber-pale);border:1px solid var(--amber-light);color:var(--ink2)}
-.alert-success{background:var(--forest-pale);border:1px solid var(--forest-light);color:var(--forest)}
-.alert-error{background:var(--rose-light);border:1px solid #e5c8cc;color:var(--rose)}
-
-/* ── VOTES REMAINING ── */
-.votes-remaining{display:flex;align-items:center;gap:8px;padding:10px 16px;background:var(--amber-pale);border:1px solid var(--amber-light);border-radius:var(--radius-sm);margin-bottom:16px;font-size:14px;color:var(--ink2)}
+.page-header{padding:16px 14px 12px;border-bottom:1px solid var(--border2);background:var(--paper);position:sticky;top:0;z-index:10}
+.page-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:400;color:var(--ink);line-height:1.2}
+.page-sub{font-size:13px;color:var(--ink3);margin-top:2px}
+.page-body{padding:12px 12px}
+.card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);margin-bottom:12px;overflow:hidden}
+.card-head{padding:12px 14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:10px}
+.card-icon{font-size:17px}
+.card-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--ink)}
+.card-body{padding:14px}
+.card-badge{margin-left:auto;background:var(--amber-light);color:var(--amber);font-size:11px;padding:3px 10px;border-radius:10px;font-weight:500}
+.meetup-hero{background:var(--forest);border-radius:var(--radius);padding:18px 16px;color:#fff;margin-bottom:12px;position:relative;overflow:hidden}
+.meetup-hero::after{content:"\01F4DA";position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:60px;opacity:.07;pointer-events:none}
+.meetup-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:4px}
+.meetup-date{font-family:'Playfair Display',serif;font-size:24px;font-weight:400;line-height:1.25;margin-bottom:2px}
+.meetup-date-sub{font-size:13px;color:rgba(255,255,255,.6)}
+.meetup-countdown{font-size:12px;color:rgba(255,255,255,.45);margin-top:7px}
+.book-display{display:flex;gap:13px;align-items:flex-start}
+.book-spine{width:46px;height:66px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0;box-shadow:2px 3px 8px rgba(0,0,0,.2)}
+.book-display-info{flex:1;min-width:0}
+.book-display-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:3px}
+.book-display-title{font-family:'Playfair Display',serif;font-size:17px;font-weight:600;color:var(--ink);line-height:1.3}
+.book-display-author{font-size:13px;color:var(--ink2);margin-top:2px;font-style:italic}
+.book-display-pages{font-size:12px;color:var(--ink3);margin-top:4px}
+.votes-remaining{display:flex;align-items:center;gap:8px;padding:10px 13px;background:var(--amber-pale);border:1px solid var(--amber-light);border-radius:var(--radius-sm);margin-bottom:10px;font-size:13px;color:var(--ink2)}
 .vote-dots{display:flex;gap:5px}
 .vote-dot{width:10px;height:10px;border-radius:50%;background:var(--amber);transition:background .2s}
 .vote-dot.used{background:var(--border)}
-
-/* ── SEARCH BOX ── */
-.search-wrap{position:relative;margin-bottom:16px}
-.search-wrap .input{padding-left:38px}
-.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink4);font-size:16px;pointer-events:none}
-.search-results{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);z-index:100;max-height:250px;overflow-y:auto;display:none}
+.act-link-banner{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:11px 13px;margin-bottom:10px;text-decoration:none;transition:background .15s}
+.act-link-banner:hover{background:var(--warm)}
+.act-link-banner-text{flex:1;min-width:0}
+.act-link-banner-title{font-size:13px;color:var(--ink2);font-weight:500}
+.act-link-banner-sub{font-size:12px;color:var(--amber);margin-top:1px}
+.book-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:11px 11px;display:flex;gap:10px;align-items:center;margin-bottom:8px;transition:border-color .15s}
+.book-card.voted-lib{border-color:var(--amber);border-width:1.5px;background:var(--amber-pale)}
+.book-card-cover{width:46px;height:66px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:19px}
+.book-card-cover img{width:46px;height:66px;object-fit:cover;border-radius:5px;display:block;box-shadow:1px 2px 5px rgba(0,0,0,.15)}
+.book-card-body{flex:1;min-width:0}
+.book-card-title{font-family:'Playfair Display',serif;font-size:14px;font-weight:400;color:var(--ink);line-height:1.35;margin-bottom:3px}
+.book-card-meta{font-size:12px;color:var(--ink3)}
+.book-card-votes{font-size:11px;color:var(--amber);font-weight:500;margin-top:3px}
+.book-card-vote-area{display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;padding-left:10px;border-left:1px solid var(--border2)}
+.book-card-count{font-family:'Playfair Display',serif;font-size:20px;color:var(--ink2);line-height:1;text-align:center;min-width:24px}
+.book-card-count-label{font-size:10px;color:var(--ink4);text-align:center}
+.btn-vote-cast{background:none;border:1.5px solid var(--amber);color:var(--amber);border-radius:8px;padding:8px 14px;font-family:'Crimson Pro',serif;font-size:13px;font-weight:500;cursor:pointer;min-width:64px;transition:all .15s;white-space:nowrap}
+.btn-vote-cast:hover{background:var(--amber);color:#fff}
+.btn-vote-cast.voted{background:var(--amber);color:#fff}
+.btn-vote-cast:disabled{opacity:.35;cursor:not-allowed;border-color:var(--border);color:var(--ink3)}
+.filter-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;margin-bottom:10px;scrollbar-width:none}
+.filter-row::-webkit-scrollbar{display:none}
+.filter-btn{border:1px solid var(--border);background:var(--surface);color:var(--ink3);border-radius:20px;padding:5px 13px;font-family:'Crimson Pro',serif;font-size:13px;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.filter-btn.active{background:var(--amber);border-color:var(--amber);color:#fff}
+.sort-bar{display:flex;align-items:center;gap:6px;margin-bottom:10px;font-size:12px;color:var(--ink3)}
+.sort-btn{border:none;background:none;font-family:'Crimson Pro',serif;font-size:12px;color:var(--ink3);cursor:pointer;padding:3px 10px;border-radius:12px;transition:all .15s}
+.sort-btn.active{background:var(--amber-light);color:var(--amber);font-weight:500}
+.search-wrap{position:relative;margin-bottom:10px}
+.search-wrap .input{padding-left:35px}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--ink4);font-size:15px;pointer-events:none}
+.search-results{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);box-shadow:var(--shadow-md);z-index:100;max-height:220px;overflow-y:auto;display:none}
 .search-results.open{display:block}
 .search-result{padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border2);transition:background .1s}
 .search-result:hover{background:var(--warm)}
 .search-result:last-child{border-bottom:none}
 .search-result-title{font-size:14px;color:var(--ink)}
 .search-result-author{font-size:12px;color:var(--ink3);font-style:italic}
-
-/* ── MISC ── */
-.section-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:400;color:var(--ink);margin-bottom:14px}
-.divider{border:none;border-top:1px solid var(--border2);margin:20px 0}
-.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:10px;font-weight:500}
-.empty-state{text-align:center;padding:40px 20px;color:var(--ink3)}
-.empty-state .empty-icon{font-size:40px;margin-bottom:12px}
-.empty-state .empty-text{font-size:15px;font-style:italic}
-.spinner{display:inline-block;width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+.hist-item{display:flex;gap:12px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--border2)}
+.hist-item:last-child{border-bottom:none}
+.hist-spine{width:40px;height:56px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.hist-info{flex:1}
+.hist-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--ink)}
+.hist-author{font-size:13px;color:var(--ink3);font-style:italic;margin-top:1px}
+.hist-date{font-size:12px;color:var(--ink4);margin-top:3px}
+.member-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border2)}
+.member-row:last-child{border-bottom:none}
+.member-avatar-lg{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0}
+.member-info{flex:1;min-width:0}
+.member-name{font-size:15px;color:var(--ink);font-weight:500}
+.member-email{font-size:12px;color:var(--ink3)}
+.member-role-badge{font-size:11px;padding:3px 9px;border-radius:10px;font-weight:500;flex-shrink:0}
+.role-admin{background:var(--rose-light);color:var(--rose)}
+.role-user{background:var(--forest-pale);color:var(--forest)}
+.pending-book{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:11px 13px;display:flex;gap:10px;align-items:center;margin-bottom:8px}
+.pend-info{flex:1;min-width:0}
+.pend-title{font-size:14px;font-weight:500;color:var(--ink)}
+.pend-author{font-size:12px;color:var(--ink3);font-style:italic;margin-top:2px}
+.pending-badge{font-size:11px;background:var(--amber-light);color:var(--amber);padding:2px 8px;border-radius:10px;flex-shrink:0}
+.btn{border:none;border-radius:var(--radius-sm);padding:10px 18px;font-family:'Crimson Pro',serif;font-size:14px;cursor:pointer;transition:all .15s;font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--ink);color:#fff}
+.btn-amber{background:var(--amber);color:#fff}
+.btn-amber:hover{background:#a86920}
+.btn-outline{background:none;border:1px solid var(--border);color:var(--ink2)}
+.btn-outline:hover{border-color:var(--ink3);background:var(--warm)}
+.btn-danger{background:var(--rose-light);color:var(--rose);border:none}
+.btn-danger:hover{background:var(--rose);color:#fff}
+.btn-sm{padding:8px 15px;font-size:13px}
+.btn-xs{padding:6px 11px;font-size:12px}
+.field{margin-bottom:12px}
+.label{display:block;font-size:11px;font-weight:600;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:5px}
+.input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Crimson Pro',serif;font-size:15px;background:var(--surface);color:var(--ink);outline:none;transition:border-color .15s}
+.input:focus{border-color:var(--amber)}
+.select{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Crimson Pro',serif;font-size:15px;background:var(--surface);color:var(--ink);outline:none;cursor:pointer}
+.overlay{position:fixed;inset:0;background:rgba(26,16,9,.55);z-index:1000;display:flex;align-items:center;justify-content:center;padding:14px;backdrop-filter:blur(3px)}
+.overlay.hidden{display:none}
+.modal{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow-md);width:100%;max-width:440px;max-height:90vh;overflow-y:auto}
+.modal-head{padding:16px 18px 12px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:400}
+.modal-close{background:none;border:none;font-size:18px;color:var(--ink3);cursor:pointer;padding:4px 8px;border-radius:4px;line-height:1}
+.modal-close:hover{background:var(--warm)}
+.modal-body{padding:16px 18px}
+.modal-foot{padding:13px 18px;border-top:1px solid var(--border2);display:flex;gap:8px;justify-content:flex-end}
+.alert{padding:10px 13px;border-radius:var(--radius-sm);font-size:13px;margin-bottom:11px;line-height:1.5}
+.alert-info{background:var(--amber-pale);border:1px solid var(--amber-light);color:var(--ink2)}
+.alert-success{background:var(--forest-pale);border:1px solid var(--forest-light);color:var(--forest)}
+.alert-error{background:var(--rose-light);border:1px solid #e5c8cc;color:var(--rose)}
+.section-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:400;color:var(--ink);margin-bottom:10px}
+.divider{border:none;border-top:1px solid var(--border2);margin:14px 0}
+.empty-state{text-align:center;padding:28px 20px;color:var(--ink3)}
+.empty-icon{font-size:34px;margin-bottom:8px}
+.empty-text{font-size:14px;font-style:italic}
+.spinner{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-overlay{position:fixed;inset:0;background:rgba(26,16,9,.6);display:flex;align-items:center;justify-content:center;z-index:2000;backdrop-filter:blur(4px)}
+.loading-overlay{position:fixed;inset:0;background:rgba(26,16,9,.55);display:flex;align-items:center;justify-content:center;z-index:2000}
 .loading-card{background:var(--surface);border-radius:var(--radius);padding:24px 32px;text-align:center}
-.loading-card .load-icon{font-size:32px;margin-bottom:10px;display:block}
-.loading-card .load-text{font-size:15px;color:var(--ink2);font-style:italic}
-
-/* ── BOOK CARDS (library) ── */
-.book-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:14px;display:flex;gap:14px;margin-bottom:10px;transition:border-color .2s,box-shadow .2s}
-.book-card:hover{border-color:var(--border);box-shadow:var(--shadow)}
-.book-card.voted-lib{border-color:var(--amber);background:var(--amber-pale)}
-.book-card-cover{width:62px;flex-shrink:0;position:relative}
-.book-card-cover img{width:62px;height:90px;object-fit:cover;border-radius:4px;box-shadow:2px 2px 6px rgba(0,0,0,.2);display:block}
-.book-card-cover-placeholder{width:62px;height:90px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:2px 2px 6px rgba(0,0,0,.15)}
-.book-card-body{flex:1;min-width:0}
-.book-card-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:400;color:var(--ink);line-height:1.3;margin-bottom:2px}
-.book-card-author{font-size:13px;color:var(--ink3);font-style:italic;margin-bottom:6px}
-.book-card-synopsis{font-size:12px;color:var(--ink2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
-.book-card-meta{display:flex;align-items:center;gap:8px;margin-top:8px;flex-wrap:wrap}
-.book-card-pages{font-size:11px;color:var(--ink4)}
-.book-card-vote{display:flex;flex-direction:column;align-items:center;gap:4px;flex-shrink:0;padding-left:10px;border-left:1px solid var(--border2)}
-.book-card-vote-count{font-family:'Playfair Display',serif;font-size:18px;color:var(--ink2);line-height:1}
-.book-card-vote-label{font-size:10px;color:var(--ink4);text-align:center}
-
-/* Sort bar */
-.sort-bar{display:flex;align-items:center;gap:10px;margin-bottom:12px;font-size:13px;color:var(--ink3)}
-.sort-btn{border:none;background:none;font-family:'Crimson Pro',serif;font-size:13px;color:var(--ink3);cursor:pointer;padding:3px 8px;border-radius:12px;transition:all .15s}
-.sort-btn.active{background:var(--amber-light);color:var(--amber);font-weight:500}
-
-/* ── FILTER BUTTONS ── */
-.filter-btn{border:1px solid var(--border);background:var(--surface);color:var(--ink3);border-radius:20px;padding:4px 12px;font-family:'Crimson Pro',serif;font-size:12px;cursor:pointer;transition:all .15s;white-space:nowrap}
-.filter-btn:hover{border-color:var(--amber);color:var(--amber)}
-.filter-btn.active{background:var(--amber);border-color:var(--amber);color:#fff}
-
-/* ── LIBRARY BOOK ROW ── */
-.lib-row{display:flex;align-items:center;gap:12px;padding:9px 4px;border-bottom:1px solid var(--border2);transition:background .1s}
-.lib-row:last-child{border-bottom:none}
-.lib-row:hover{background:var(--warm);margin:0 -4px;padding:9px 8px;border-radius:var(--radius-sm)}
-.lib-row-info{flex:1;min-width:0}
-.lib-row-title{font-size:14px;color:var(--ink);line-height:1.3}
-.lib-row-author{font-size:12px;color:var(--ink3);font-style:italic}
-.lib-row-pages{font-size:11px;color:var(--ink4);margin-top:1px}
-.lib-vote-btn{border:1.5px solid var(--amber);background:none;color:var(--amber);border-radius:var(--radius-sm);padding:5px 12px;font-family:'Crimson Pro',serif;font-size:12px;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
-.lib-vote-btn:hover{background:var(--amber);color:#fff}
-.lib-vote-btn.voted{background:var(--amber);color:#fff}
-.lib-vote-btn:disabled{opacity:.35;cursor:not-allowed;border-color:var(--border)}
-.lib-vote-count{font-size:11px;color:var(--ink4);text-align:center;margin-top:2px}
-
-.flex-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.load-icon{font-size:30px;margin-bottom:8px;display:block}
+.load-text{font-size:14px;color:var(--ink2);font-style:italic}
+.flex-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .ml-auto{margin-left:auto}
-.mt-0{margin-top:0}
-.mb-0{margin-bottom:0}
-
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--ink);padding:20px}
+.login-card{background:var(--paper);border-radius:16px;padding:32px 28px;width:100%;max-width:390px;text-align:center}
+.login-logo{font-size:42px;margin-bottom:12px}
+.login-title{font-family:'Playfair Display',serif;font-size:25px;font-weight:400;color:var(--ink);margin-bottom:5px}
+.login-sub{font-size:14px;color:var(--ink3);font-style:italic;margin-bottom:22px}
+.login-form{text-align:left}
+.login-hint{font-size:13px;color:var(--ink3);text-align:center;margin-top:10px;font-style:italic}
+.login-success{background:var(--forest-pale);border:1px solid var(--forest-light);border-radius:var(--radius-sm);padding:14px;color:var(--forest);font-size:14px;margin-top:14px;text-align:center;display:none}
+.setup-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--ink);padding:20px}
+.setup-card{background:var(--paper);border-radius:16px;padding:32px;width:100%;max-width:560px}
+.setup-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:400;margin-bottom:6px}
+.setup-sub{font-size:14px;color:var(--ink3);font-style:italic;margin-bottom:20px}
+.code-block{background:var(--ink);border-radius:var(--radius-sm);padding:14px;font-family:'Courier New',monospace;font-size:11px;color:#74C69D;line-height:1.8;white-space:pre-wrap;word-break:break-all;margin-bottom:14px;overflow-x:auto}
+.steps-list{margin:0 0 18px 20px;font-size:14px;color:var(--ink2);line-height:2}
 @media(max-width:680px){
   .sidebar{display:none}
   .mobile-nav{display:block}
-  .main{padding-bottom:56px}
-  .page-header{padding:20px 16px 14px;position:relative}
-  .page-body{padding:16px}
-  .meetup-date{font-size:24px}
-  .book-hero{flex-direction:column;gap:12px}
+  .main{padding-bottom:64px}
+}
+@media(min-width:681px){
+  .page-header{padding:22px 28px 16px}
+  .page-body{padding:20px 28px}
 }
 </style>
 </head>
@@ -540,59 +458,51 @@ html,body{height:100%;background:var(--cream);color:var(--ink);font-family:'Crim
     <!-- ── VOTE TAB ── -->
     <div class="page" id="tab-vote">
       <div class="page-header">
-        <div class="flex-row" style="align-items:flex-start;gap:12px">
-          <div>
-            <div class="page-title">Vote for Next Read</div>
-            <div class="page-sub">Browse the ACT Libraries list or suggest your own</div>
-          </div>
-          <button class="btn btn-outline btn-sm ml-auto" style="flex-shrink:0" onclick="openSuggestModal()">+ Suggest unlisted book</button>
-        </div>
+        <div class="page-title">Vote for Next Read</div>
+        <div class="page-sub">Browse the ACT Libraries list or suggest your own</div>
       </div>
       <div class="page-body">
+        <a class="act-link-banner" href="https://www.library.act.gov.au/__data/assets/word_doc/0003/3076113/List-of-all-current-book-club-sets-May-2026-edit1.docx" target="_blank">
+          <span style="font-size:20px">📖</span>
+          <div class="act-link-banner-text">
+            <div class="act-link-banner-title">ACT Libraries Book Club List</div>
+            <div class="act-link-banner-sub">Download the full list &#x2192;</div>
+          </div>
+        </a>
         <div id="votes-remaining-bar" class="votes-remaining">
-          <span>🗳️ Your votes:</span>
+          <span>Your votes:</span>
           <div class="vote-dots" id="vote-dots"></div>
-          <span id="votes-left-text" style="font-size:13px;color:var(--ink3)"></span>
+          <span id="votes-left-text" style="font-size:12px;color:var(--ink3)"></span>
         </div>
-
-        <!-- ACT Libraries book list -->
-        <div class="card" style="margin-bottom:16px">
-          <div class="card-head">
-            <span class="card-icon">📚</span>
-            <span class="card-title">ACT Libraries Book List</span>
-            <span style="font-size:12px;color:var(--ink3);margin-left:auto;font-style:italic">386 books</span>
-          </div>
-          <div class="card-body" style="padding:14px 16px">
-            <div class="search-wrap" style="margin-bottom:10px">
-              <span class="search-icon">🔍</span>
-              <input class="input" id="library-search" type="text" placeholder="Search by title or author..." oninput="filterLibrary()">
-            </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-              <button class="filter-btn active" onclick="setGenreFilter('all',this)">All</button>
-              <button class="filter-btn" onclick="setGenreFilter('new',this)">New Titles</button>
-              <button class="filter-btn" onclick="setGenreFilter('aus',this)">Australian</button>
-              <button class="filter-btn" onclick="setGenreFilter('classics',this)">Classics</button>
-              <button class="filter-btn" onclick="setGenreFilter('contemporary',this)">Contemporary</button>
-              <button class="filter-btn" onclick="setGenreFilter('historical',this)">Historical</button>
-              <button class="filter-btn" onclick="setGenreFilter('mystery',this)">Mystery</button>
-              <button class="filter-btn" onclick="setGenreFilter('nonfiction',this)">Non-Fiction</button>
-            </div>
-            <div class="sort-bar">
-              <span>Sort:</span>
-              <button class="sort-btn active" onclick="setSortMode('votes',this)">Most voted first</button>
-              <button class="sort-btn" onclick="setSortMode('alpha',this)">A–Z</button>
-            </div>
-            <div id="library-list" style="max-height:480px;overflow-y:auto"></div>
-          </div>
+        <div class="search-wrap">
+          <span class="search-icon">&#x1F50D;</span>
+          <input class="input" id="library-search" type="text" placeholder="Search by title or author..." oninput="filterLibrary()">
         </div>
-
-        <div id="pending-review-section" style="display:none">
-          <div class="section-title">⏳ Your Pending Suggestions</div>
+        <div class="filter-row">
+          <button class="filter-btn active" onclick="setGenreFilter('all',this)">All</button>
+          <button class="filter-btn" onclick="setGenreFilter('new',this)">New</button>
+          <button class="filter-btn" onclick="setGenreFilter('aus',this)">Australian</button>
+          <button class="filter-btn" onclick="setGenreFilter('classics',this)">Classics</button>
+          <button class="filter-btn" onclick="setGenreFilter('contemporary',this)">Contemporary</button>
+          <button class="filter-btn" onclick="setGenreFilter('historical',this)">Historical</button>
+          <button class="filter-btn" onclick="setGenreFilter('mystery',this)">Mystery</button>
+          <button class="filter-btn" onclick="setGenreFilter('nonfiction',this)">Non-Fiction</button>
+        </div>
+        <div class="sort-bar">
+          <span>Sort:</span>
+          <button class="sort-btn active" onclick="setSortMode('votes',this)">Most voted</button>
+          <button class="sort-btn" onclick="setSortMode('alpha',this)">A&#x2013;Z</button>
+          <button class="btn btn-outline btn-xs ml-auto" onclick="openSuggestModal()">+ Suggest book</button>
+        </div>
+        <div id="library-list"></div>
+        <div id="pending-review-section" style="display:none;margin-top:14px">
+          <div class="section-title">Your Pending Suggestions</div>
           <div id="pending-books-list"></div>
-          <hr class="divider">
         </div>
-        <div class="section-title">Member Suggested Books</div>
-        <div id="vote-books-list"></div>
+        <div style="margin-top:12px">
+          <div class="section-title">Member Suggested Books</div>
+          <div id="vote-books-list"></div>
+        </div>
       </div>
     </div>
 
@@ -1586,18 +1496,15 @@ function renderNextBook(){
   const wrap = document.getElementById('nextbook-display');
 
   if(title){
-    wrap.innerHTML = `
-      <div class="meetup-hero" style="background:linear-gradient(135deg,#3a2a5a 0%,#1d1535 100%);margin-bottom:16px">
-        <div class="meetup-label">Next Chosen Read</div>
-        <div class="meetup-date" style="font-size:26px">${esc(title)}</div>
-        <div class="meetup-date-sub">${esc(author||'')}</div>
-        ${pages ? `<div class="meetup-countdown">📄 ${pages} pages</div>` : ''}
-      </div>
-      <div class="card">
-        <div class="card-body" style="font-size:14px;color:var(--ink3);font-style:italic;text-align:center;padding:14px">
-          📖 This is our next book — start requesting it from your library!
-        </div>
-      </div>`;
+    wrap.innerHTML = '<div class="meetup-hero" style="background:#3a2a5a;margin-bottom:12px">'
+        + '<div class="meetup-label">Next Chosen Read</div>'
+        + '<div class="meetup-date">' + esc(title) + '</div>'
+        + '<div class="meetup-date-sub">' + esc(author||'') + '</div>'
+        + (pages ? '<div class="meetup-countdown">\ud83d\udcc4 ' + pages + ' pages</div>' : '')
+      + '</div>'
+      + '<div class="card"><div class="card-body" style="text-align:center;color:var(--ink3);font-style:italic;font-size:14px">'
+        + '\ud83d\udcd6 This is our next book \u2014 start requesting it from your library!'
+      + '</div></div>';
   } else {
     wrap.innerHTML = `<div class="empty-state"><div class="empty-icon">🔖</div><div class="empty-text">No book chosen yet — vote to help decide!</div></div>`;
   }
@@ -1720,24 +1627,20 @@ function renderLibrary(q=''){
     const authorSafe = b.author.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 
     const coverHtml = coverUrl
-      ? '<img src="' + coverUrl + '" alt="cover" style="width:62px;height:90px;object-fit:cover;border-radius:4px;box-shadow:2px 2px 6px rgba(0,0,0,.2);display:block">'
+      ? '<img src="' + coverUrl + '" alt="cover" style="width:46px;height:66px;object-fit:cover;border-radius:5px;display:block">'
       : '<div class="book-card-cover-placeholder" style="background:' + spineColor + '" data-lib-id="' + libId + '">📖</div>';
 
     return '<div class="book-card ' + (iVoted?'voted-lib':'') + '" id="card-' + libId + '">'
-      + '<div class="book-card-cover">' + coverHtml + '</div>'
+      + '<div class="book-card-cover" style="background:' + spineColor + '">' + coverHtml + '</div>'
       + '<div class="book-card-body">'
         + '<div class="book-card-title">' + esc(b.title) + '</div>'
-        + '<div class="book-card-author">' + esc(b.author) + '</div>'
-        + (b.synopsis ? '<div class="book-card-synopsis">' + esc(b.synopsis) + '</div>' : '')
-        + '<div class="book-card-meta">'
-          + (b.pages ? '<span class="book-card-pages">📄 ' + b.pages + 'p</span>' : '')
-          + (vCount > 0 ? '<span style="font-size:11px;color:var(--amber);font-weight:500">🗳️ ' + vCount + ' vote' + (vCount===1?'':'s') + '</span>' : '')
-        + '</div>'
+        + '<div class="book-card-meta">' + esc(b.author) + (b.pages ? ' \u00b7 ' + b.pages + 'p' : '') + '</div>'
+        + (vCount > 0 ? '<div class="book-card-votes">' + vCount + ' vote' + (vCount===1?'':'s') + '</div>' : '')
       + '</div>'
-      + '<div class="book-card-vote">'
-        + '<div class="book-card-vote-count">' + vCount + '</div>'
-        + '<div class="book-card-vote-label">vote' + (vCount===1?'':'s') + '</div>'
-        + '<button class="lib-vote-btn ' + (iVoted?'voted':'') + '" style="margin-top:6px" onclick="castLibVote(\'' + libId + '\',\'' + titleSafe + '\',\'' + authorSafe + '\',' + (b.pages||0) + ')" ' + ((!canVote && !iVoted)?'disabled':'') + '>' + (iVoted?'✓':'Vote') + '</button>'
+      + '<div class="book-card-vote-area">'
+        + '<div class="book-card-count">' + vCount + '</div>'
+        + '<div class="book-card-count-label">vote' + (vCount===1?'':'s') + '</div>'
+        + '<button class="btn-vote-cast ' + (iVoted?'voted':'') + '" onclick="castLibVote(\'' + libId + '\',\'' + titleSafe + '\',\'' + authorSafe + '\',' + (b.pages||0) + ')" ' + ((!canVote && !iVoted)?'disabled':'') + '>' + (iVoted?'\u2713 Voted':'Vote') + '</button>'
       + '</div>'
     + '</div>';
   }).join('');
@@ -1752,7 +1655,7 @@ function renderLibrary(q=''){
         if(ph){
           const img = document.createElement('img');
           img.src = url; img.alt = b.title;
-          img.style.cssText = 'width:62px;height:90px;object-fit:cover;border-radius:4px;box-shadow:2px 2px 6px rgba(0,0,0,.2);display:block';
+          img.style.cssText = 'width:46px;height:66px;object-fit:cover;border-radius:5px;display:block';
           ph.replaceWith(img);
         }
       }
@@ -1836,24 +1739,22 @@ function renderVoteTab(){
       const iVoted = myVotes.includes(book.id);
       const canVote = !iVoted && remaining > 0;
       const barW = maxVotes > 0 ? Math.round((voteCount / maxVotes) * 100) : 0;
-      return `<div class="vote-book ${iVoted ? 'voted-this' : ''}">
-        <div class="vote-book-info">
-          <div class="vote-book-title">${esc(book.title)}</div>
-          <div class="vote-book-author">${esc(book.author)}</div>
-          ${book.pages ? `<div class="vote-book-status">📄 ${book.pages} pages</div>` : ''}
-          <div class="vote-bar-wrap"><div class="vote-bar" style="width:${barW}%"></div></div>
-        </div>
-        <div class="vote-actions">
-          <div>
-            <div class="vote-count">${voteCount}</div>
-            <div class="vote-count-label">vote${voteCount===1?'':'s'}</div>
-          </div>
-          ${iVoted 
-            ? `<button class="btn-vote voted" onclick="removeVote('${book.id}')">✓ Voted</button>`
-            : `<button class="btn-vote" onclick="castVote('${book.id}')" ${canVote?'':'disabled'}>${canVote?'Vote':'No votes'}</button>`
-          }
-        </div>
-      </div>`;
+      const spC = SPINE_COLORS[Math.abs(book.id.charCodeAt(0)||0) % SPINE_COLORS.length];
+      return '<div class="book-card ' + (iVoted?'voted-lib':'') + '">'
+        + '<div class="book-card-cover" style="background:' + spC + ';display:flex;align-items:center;justify-content:center;font-size:19px">\ud83d\udcd6</div>'
+        + '<div class="book-card-body">'
+          + '<div class="book-card-title">' + esc(book.title) + '</div>'
+          + '<div class="book-card-meta">' + esc(book.author) + (book.pages ? ' \u00b7 ' + book.pages + 'p' : '') + '</div>'
+          + (voteCount > 0 ? '<div class="book-card-votes">' + voteCount + ' vote' + (voteCount===1?'':'s') + '</div>' : '')
+        + '</div>'
+        + '<div class="book-card-vote-area">'
+          + '<div class="book-card-count">' + voteCount + '</div>'
+          + '<div class="book-card-count-label">vote' + (voteCount===1?'':'s') + '</div>'
+          + (iVoted
+            ? '<button class="btn-vote-cast voted" onclick="removeVote(\'' + book.id + '\')">\u2713 Voted</button>'
+            : '<button class="btn-vote-cast" onclick="castVote(\'' + book.id + '\')" ' + (canVote?'':'disabled') + '>' + (canVote?'Vote':'No votes') + '</button>')
+        + '</div>'
+      + '</div>';
     }).join('');
   }
 }
